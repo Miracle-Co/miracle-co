@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Miracle & Co</title>
+  <style>
+/* ===== RESET & BASE ===== */
+* { box-sizing: border-box; max-width: 100%; }
+
+body {
+margin: 0; padding: 0;
+font-family: Arial, sans-serif;
+background: #f5f5f5;
+color: #333;
+overflow-x: hidden;
+transition: background 0.3s, color 0.3s;
+padding-bottom: 40px;
+}
+
+/* ===== MODE NUIT ===== */
+body.dark {
+background: #121212;
+color: #e0e0e0;
+}
+body.dark .card { background: #1e1e1e !important; color: #e0e0e0; }
+body.dark .card h3, body.dark .card p { color: #e0e0e0; }
+body.dark .page-titre h2 { color: #f5a623; }
+body.dark .apropos-bloc { background: #1e1e1e; color: #e0e0e0; }
+body.dark .description-detail { background: #2a2a2a; color: #ccc; }
+body.dark #page-produit, body.dark .produit-detail { background: #1a1a1a; color: #e0e0e0; }
+body.dark .produit-detail h2 { color: #f5a623; }
+body.dark .panier-container { background: #1e1e1e; color: #e0e0e0; }
+body.dark .panier-container li { border-color: #444; color: #e0e0e0; }
+body.dark .connexion-box { background: #1a1a1a; }
+body.dark .barre-recherche input { background: #2a2a2a; color: #e0e0e0; border-color: #444; }
+body.dark .avantage-card { background: #1e1e1e; color: #e0e0e0; }
+body.dark .temoignage { background: #2a2a2a; color: #ccc; }
+body.dark .footer-principal { background: #0d0d0d; }
+
+/* ===== HEADER ===== */
+header {
+background: #1a1a1a;
+padding: 0 25px;
+position: sticky;
+top: 0;
+z-index: 9996;
+box-shadow: 0 3px 15px rgba(0,0,0,0.5);
+}
+.header-contenu {
+display: flex;
+justify-content: space-between;
+align-items: center;
+height: 62px;
+}
+.logo-miracle {
+color: #f5a623;
+font-size: 22px;
+font-weight: bold;
+letter-spacing: 2px;
+text-decoration: none;
+cursor: pointer;
+flex-shrink: 0;
+}
+
+/* --- NAV DESKTOP (bande horizontale) --- */
+.menu-cache {
+display: flex;
+flex-direction: row;
+align-items: center;
+gap: 4px;
+margin: 0;
+padding: 0;
+background: transparent;
+}
+.menu-cache a {
+color: rgba(255,255,255,0.85);
+text-decoration: none;
+font-size: 13px;
+font-weight: bold;
+padding: 8px 12px;
+border-radius: 8px;
+display: flex;
+align-items: center;
+gap: 5px;
+letter-spacing: 0.5px;
+transition: background 0.2s, color 0.2s;
+border-bottom: none;
+white-space: nowrap;
+}
+.menu-cache a:hover { background: rgba(245,166,35,0.15); color: #f5a623; }
+.menu-cache a.actif { background: rgba(245,166,35,0.2); color: #f5a623; }
+
+/* Icônes spéciales dans la nav desktop */
+.nav-icone-btn {
+background: rgba(255,255,255,0.08);
+border: none;
+color: white;
+width: 38px;
+height: 38px;
+border-radius: 8px;
+font-size: 17px;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: background 0.2s;
+position: relative;
+}
+.nav-icone-btn:hover { background: rgba(245,166,35,0.25); }
+
+/* Badge panier desktop */
+.badge-menu {
+background: #f5a623;
+color: white;
+border-radius: 50%;
+padding: 2px 6px;
+font-size: 11px;
+font-weight: bold;
+position: absolute;
+top: -4px;
+right: -4px;
+min-width: 18px;
+text-align: center;
+line-height: 14px;
+}
+
+/* Groupe icônes à droite */
+.nav-icones-groupe {
+display: flex;
+align-items: center;
+gap: 6px;
+margin-left: 8px;
+}
+
+/* --- HAMBURGER (masqué sur desktop) --- */
+.menu-hamburger {
+display: none;
+color: white;
+font-size: 28px;
+cursor: pointer;
+background: #333;
+padding: 6px 11px;
+border-radius: 8px;
+line-height: 1;
+}
+
+/* ===== RESPONSIVE : MOBILE ===== */
+@media (max-width: 768px) {
+  header { padding: 0 15px; }
+  .menu-hamburger { display: block; }
+  .nav-icones-groupe { display: none; }
+
+  /* Sur mobile, le nav devient un menu déroulant vertical */
+  .menu-cache {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 62px;
+    left: 0;
+    right: 0;
+    background: rgba(18,18,18,0.98);
+    padding: 8px 0 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    z-index: 9995;
+  }
+  .menu-cache.menu-ouvert { display: flex !important; }
+  .menu-cache a {
+    font-size: 16px;
+    padding: 16px 25px;
+    border-radius: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    letter-spacing: 1.5px;
+    justify-content: flex-start;
+  }
+  .menu-cache a:last-child { border-bottom: none; }
+  /* Badge panier sur mobile : inline */
+  .badge-menu {
+    position: static;
+    margin-left: 4px;
+    line-height: 1;
+    padding: 2px 7px;
+    font-size: 12px;
+  }
+}
+
+/* ===== NOTIFICATION ===== */
+#notification {
+position: fixed;
+bottom: 50px;
+right: 20px;
+background: #4CAF50;
+color: white;
+padding: 15px 20px;
+border-radius: 10px;
+font-size: 16px;
+z-index: 99999;
+box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* ===== BANDEAU BAS ===== */
+.bandeau-info {
+position: fixed;
+bottom: 0; left: 0;
+width: 100%;
+background: #1a1a2e;
+color: #f5a623;
+padding: 8px 0;
+overflow: hidden;
+z-index: 9997;
+white-space: nowrap;
+}
+.bandeau-info .contenu {
+display: inline-block;
+animation: defiler 25s linear infinite;
+}
+@keyframes defiler {
+0% { transform: translateX(100vw); }
+100% { transform: translateX(-100%); }
+}
+
+/* ===== CONNEXION / INSCRIPTION ===== */
+/* CORRECTION : display flex ajouté pour le centrage du panneau */
+#panneau-connexion {
+position: fixed; top: 0; left: 0;
+width: 100%; height: 100%;
+background: rgba(0,0,0,0.85);
+z-index: 99999;
+display: none;
+align-items: center;
+justify-content: center;
+}
+/* CORRECTION : quand ouvert via JS (display:flex), le flex fonctionne grâce à align-items/justify-content ci-dessus */
+.connexion-box {
+background: #1a1a1a;
+padding: 25px 20px;
+border-radius: 20px;
+width: 90%;
+max-width: 400px;
+display: flex;
+flex-direction: column;
+gap: 12px;
+}
+.onglets-auth {
+display: flex;
+gap: 0;
+border-radius: 10px;
+overflow: hidden;
+border: 1px solid #444;
+}
+.onglet-btn {
+flex: 1;
+padding: 12px;
+border: none;
+background: #333;
+color: #aaa;
+font-size: 15px;
+cursor: pointer;
+transition: all 0.2s;
+}
+.onglet-btn.actif {
+background: #f5a623;
+color: white;
+font-weight: bold;
+}
+.connexion-box h2 { color: #f5a623; text-align: center; margin: 5px 0; }
+.connexion-box input {
+padding: 12px; border-radius: 10px;
+border: 1px solid #444; background: #2a2a2a;
+color: white; font-size: 16px; width: 100%;
+}
+.connexion-box button:not(.onglet-btn) {
+padding: 12px; border-radius: 10px;
+font-size: 15px; font-weight: bold; cursor: pointer; width: 100%;
+}
+#form-connexion button:first-of-type,
+#form-inscription button:first-of-type {
+background: #f5a623; color: white; border: none;
+}
+#form-connexion button:last-of-type,
+#form-inscription button:last-of-type {
+background: transparent; color: #aaa; border: 1px solid #444;
+}
+#msg-connexion, #msg-inscription {
+text-align: center; font-size: 14px; margin: 0;
+}
+
+/* ===== HERO SLIDER ===== */
+.hero-slider { position: relative; width: 100%; overflow: hidden; }
+.slide {
+display: none; width: 100%;
+min-height: 520px;
+padding: 60px 25px 100px 25px;
+box-sizing: border-box;
+animation: fadeSlide 0.7s ease;
+}
+.slide.active { display: block; }
+@keyframes fadeSlide {
+from { opacity: 0; transform: translateX(40px); }
+to { opacity: 1; transform: translateX(0); }
+}
+.slide-content { max-width: 500px; }
+.slide-content h1 {
+font-size: 32px; font-weight: 900; color: white;
+margin: 0 0 15px 0; line-height: 1.2;
+text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.slide-content h1 .accent { color: #f5a623; }
+.slide-content p {
+font-size: 15px; color: rgba(255,255,255,0.92);
+margin: 0 0 25px 0; line-height: 1.6;
+text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+.btn-slide {
+display: inline-block; background: #f5a623; color: white;
+text-decoration: none; padding: 15px 28px; border-radius: 50px;
+font-size: 15px; font-weight: bold;
+box-shadow: 0 4px 15px rgba(245,166,35,0.5);
+transition: background 0.2s;
+}
+.btn-slide:hover { background: #e0921a; }
+.badges { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
+.badges span {
+display: inline-block;
+background: rgba(255,255,255,0.18);
+backdrop-filter: blur(6px); color: white;
+padding: 9px 16px; border-radius: 50px;
+font-size: 14px; font-weight: 500; width: fit-content;
+}
+.slider-dots {
+position: absolute; bottom: 20px; left: 50%;
+transform: translateX(-50%);
+display: flex; gap: 10px; z-index: 10;
+}
+.dot {
+width: 10px; height: 10px;
+background: rgba(255,255,255,0.45); border-radius: 50%;
+cursor: pointer; transition: background 0.3s, transform 0.3s;
+}
+.dot.active { background: white; transform: scale(1.3); }
+
+/* ===== BARRE RECHERCHE ===== */
+.page-titre {
+padding: 25px 15px 10px 15px;
+text-align: center;
+}
+.page-titre h2 { font-size: 24px; color: #333; margin-bottom: 15px; }
+.barre-recherche { max-width: 500px; margin: 0 auto; position: relative; }
+.barre-recherche input {
+width: 100%; padding: 14px 50px 14px 20px;
+border-radius: 50px; border: 2px solid #f5a623;
+font-size: 16px; outline: none;
+background: white; color: #333;
+box-shadow: 0 2px 10px rgba(245,166,35,0.2);
+}
+.btn-effacer-recherche {
+position: absolute; right: 18px; top: 50%;
+transform: translateY(-50%);
+background: none; border: none; font-size: 18px;
+cursor: pointer; color: #aaa; display: none;
+padding: 0; line-height: 1;
+}
+/* Suggestions */
+#liste-suggestions {
+position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+background: white; border-radius: 16px;
+box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+z-index: 9999; display: none;
+border: 1.5px solid #f5a623;
+overflow: hidden;
+}
+body.dark #liste-suggestions { background: #2a2a2a; border-color: #f5a623; }
+.suggestion-item {
+padding: 13px 18px; display: flex; align-items: center; gap: 12px;
+cursor: pointer; font-size: 14px; color: #333; border-bottom: 1px solid #f5f5f5;
+transition: background 0.15s;
+}
+body.dark .suggestion-item { color: #e0e0e0; border-color: #3a3a3a; }
+.suggestion-item:last-child { border-bottom: none; }
+.suggestion-item:hover, .suggestion-item.actif { background: #fff8ee; }
+body.dark .suggestion-item:hover, body.dark .suggestion-item.actif { background: #3a3a3a; }
+.suggestion-img {
+width: 42px; height: 42px; object-fit: cover;
+border-radius: 8px; flex-shrink: 0;
+border: 1px solid #eee;
+}
+.suggestion-info { flex: 1; text-align: left; }
+.suggestion-nom { font-weight: bold; font-size: 14px; }
+.suggestion-prix { color: #1a7a1a; font-size: 13px; font-weight: bold; }
+.suggestion-stock-ok { color: #4CAF50; font-size: 12px; }
+.suggestion-stock-no { color: #f44336; font-size: 12px; }
+.suggestion-vide {
+padding: 18px; text-align: center; color: #aaa; font-size: 14px;
+}
+/* Filtres catégories */
+.filtres-cats {
+display: flex; gap: 8px; flex-wrap: wrap;
+justify-content: center; padding: 10px 15px 5px;
+max-width: 500px; margin: 0 auto;
+}
+.filtre-btn {
+padding: 7px 14px; border-radius: 50px; border: 1.5px solid #f5a623;
+background: white; color: #f5a623; font-size: 13px; font-weight: bold;
+cursor: pointer; transition: all 0.2s;
+}
+.filtre-btn.actif, .filtre-btn:hover { background: #f5a623; color: white; }
+body.dark .filtre-btn { background: #1e1e1e; color: #f5a623; border-color: #f5a623; }
+body.dark .filtre-btn.actif { background: #f5a623; color: white; }
+
+.msg-recherche {
+text-align: center; padding: 10px;
+color: #f5a623; font-weight: bold; font-size: 15px;
+}
+
+/* ===== GRILLE PRODUITS ===== */
+.grid {
+display: grid !important;
+grid-template-columns: repeat(2, 1fr) !important;
+gap: 15px !important;
+padding: 15px !important;
+}
+.card {
+display: block !important;
+background: white !important;
+border-radius: 10px !important;
+padding: 10px !important;
+text-align: center;
+cursor: pointer;
+transition: transform 0.2s, box-shadow 0.2s;
+box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
+.card img { width: 100%; border-radius: 10px; }
+.card h3 { font-size: 13px; margin: 8px 0 4px; }
+.card p { font-size: 14px; color: #1a7a1a; font-weight: bold; margin: 4px 0 8px; }
+.card button {
+background: #1a7a1a; color: white; border: none;
+padding: 10px 15px; border-radius: 10px;
+cursor: pointer; font-size: 13px; width: 100%;
+}
+
+/* ===== DETAIL PRODUIT ===== */
+#page-produit {
+position: fixed; top: 0; left: 0;
+width: 100%; height: 100%;
+background: white; z-index: 99998;
+overflow-y: auto; display: none;
+}
+.produit-detail { padding: 20px; max-width: 500px; margin: 0 auto; }
+.btn-fermer {
+background: none; border: none; color: #f5a623;
+font-size: 16px; cursor: pointer; text-decoration: underline;
+padding: 10px 0; display: block; margin-bottom: 15px;
+}
+.produit-detail img { width: 100%; border-radius: 10px; margin: 10px 0; }
+.produit-detail h2 { font-size: 22px; font-weight: bold; margin: 15px 0 5px; color: #1a1a1a; }
+.etoiles { font-size: 20px; margin: 5px 0; }
+.prix-detail { font-size: 28px; font-weight: bold; color: #1a7a1a; margin: 10px 0; }
+.stock-badge { display: inline-block; padding: 8px 15px; border-radius: 8px; font-weight: bold; margin: 5px 0; }
+.en-stock { background: #e8f5e9; color: #4CAF50; }
+.hors-stock { background: #ffebee; color: #f44336; }
+.description-detail { font-size: 15px; color: #444; line-height: 1.6; margin: 15px 0; padding: 15px; background: #f9f9f9; border-radius: 10px; }
+.quantite-control { display: flex; align-items: center; gap: 15px; margin: 15px 0; }
+.quantite-control button { background: #f0f0f0; border: 1px solid #ddd; width: 40px; height: 40px; border-radius: 8px; font-size: 20px; cursor: pointer; }
+.quantite-control span { font-size: 20px; font-weight: bold; min-width: 30px; text-align: center; }
+.btn-acheter { background: #1a7a1a; color: white; border: none; padding: 15px; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+
+/* ===== PAGE À PROPOS ===== */
+.apropos-container { max-width: 700px; margin: 0 auto; padding: 0 0 30px 0; }
+.apropos-hero {
+background: linear-gradient(135deg, #f5a623, #e0921a);
+color: white; text-align: center; padding: 50px 20px 40px;
+}
+.apropos-hero h1 { font-size: 36px; margin: 0 0 10px; }
+.apropos-slogan { font-size: 18px; opacity: 0.9; margin: 0; }
+.apropos-bloc { padding: 30px 20px; border-bottom: 1px solid #eee; }
+.apropos-bloc h2 { color: #f5a623; font-size: 20px; margin-bottom: 12px; }
+.apropos-bloc p { line-height: 1.7; font-size: 15px; }
+.apropos-orange { background: #fff8ee; }
+.apropos-dark { background: #1a1a1a; color: white; }
+.apropos-dark h2 { color: #f5a623; }
+
+.apropos-avantages { padding: 30px 15px; }
+.apropos-avantages h2 { color: #f5a623; font-size: 20px; text-align: center; margin-bottom: 20px; }
+.avantage-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.avantage-card {
+background: white; border-radius: 12px; padding: 18px 12px;
+text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+}
+.av-icon { font-size: 30px; margin-bottom: 8px; }
+.avantage-card h3 { font-size: 14px; color: #333; margin: 0 0 6px; }
+.avantage-card p { font-size: 13px; color: #666; line-height: 1.5; margin: 0; }
+
+.temoignages { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; }
+.temoignage { background: #2a2a2a; border-radius: 12px; padding: 18px; border-left: 4px solid #f5a623; }
+.temoignage p { font-style: italic; margin: 0 0 8px; line-height: 1.5; color: #ccc; font-size: 14px; }
+.temoignage strong { color: #f5a623; font-size: 13px; }
+
+.apropos-cta { background: #f5a623; color: white; padding: 35px 20px; text-align: center; }
+.apropos-cta h2 { font-size: 22px; margin-bottom: 10px; }
+.apropos-cta p { font-size: 15px; opacity: 0.9; margin-bottom: 20px; }
+.btn-cta { background: white; color: #f5a623; border: none; padding: 15px 30px; border-radius: 50px; font-size: 16px; font-weight: bold; cursor: pointer; }
+
+/* ===== PAGE PANIER ===== */
+.panier-container { max-width: 600px; margin: 0 auto; padding: 25px 15px; }
+.panier-container h2 { color: #f5a623; font-size: 24px; margin-bottom: 20px; }
+.panier-vide { font-size: 16px; color: #888; text-align: center; padding: 30px 0; }
+.panier-vide a { color: #f5a623; font-weight: bold; text-decoration: none; }
+#liste-panier-page { list-style: none; padding: 0; margin: 0 0 20px; }
+#liste-panier-page li {
+display: flex; justify-content: space-between; align-items: center;
+padding: 14px 0; border-bottom: 1px solid #eee;
+font-size: 15px;
+}
+#liste-panier-page li span.li-nom { flex: 1; }
+#liste-panier-page li span.li-prix { color: #1a7a1a; font-weight: bold; margin-right: 10px; }
+#liste-panier-page li button.btn-suppr {
+background: #ff4444; color: white; border: none;
+border-radius: 6px; padding: 5px 10px; cursor: pointer; font-size: 13px;
+}
+.panier-total { font-size: 20px; font-weight: bold; color: #333; margin-bottom: 15px; }
+.panier-total span { color: #f5a623; }
+.btn-vider { background: #555; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-size: 15px; cursor: pointer; width: 100%; margin-bottom: 10px; }
+.btn-valider { background: #25D366; color: white; border: none; padding: 15px 20px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-valider:hover { background: #1eb856; }
+
+/* ===== PRODUITS PHARES ACCUEIL ===== */
+.produits-phares {
+padding: 30px 15px;
+background: #fff;
+}
+body.dark .produits-phares { background: #121212; }
+.produits-phares-titre {
+text-align: center; margin-bottom: 20px;
+}
+.produits-phares-titre h2 {
+font-size: 22px; font-weight: 900; color: #1a1a1a; margin: 0 0 6px;
+}
+body.dark .produits-phares-titre h2 { color: #f5a623; }
+.produits-phares-titre p { color: #888; font-size: 14px; margin: 0; }
+.phares-grille {
+display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
+max-width: 700px; margin: 0 auto;
+}
+.phare-card {
+background: white; border-radius: 14px; overflow: hidden;
+box-shadow: 0 3px 14px rgba(0,0,0,0.09); position: relative;
+cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+border: 1.5px solid #f0f0f0;
+}
+body.dark .phare-card { background: #1e1e1e; border-color: #2a2a2a; }
+.phare-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+.phare-card.epuise { opacity: 0.72; }
+.phare-badge-stock {
+position: absolute; top: 8px; left: 8px;
+padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold;
+}
+.phare-badge-dispo { background: #e8f5e9; color: #388E3C; }
+.phare-badge-epuise { background: #ffebee; color: #e53935; }
+.phare-badge-promo {
+position: absolute; top: 8px; right: 8px;
+background: #f5a623; color: white;
+padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold;
+}
+.phare-img-wrap { width: 100%; aspect-ratio: 1/1; overflow: hidden; background: #f5f5f5; }
+.phare-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.phare-infos { padding: 10px 10px 12px; }
+.phare-nom { font-size: 13px; font-weight: bold; color: #1a1a1a; margin: 0 0 5px; line-height: 1.3; }
+body.dark .phare-nom { color: #e0e0e0; }
+.phare-prix { font-size: 15px; font-weight: 900; color: #1a7a1a; margin: 0 0 8px; }
+.phare-btn-acheter {
+width: 100%; padding: 9px; border: none; border-radius: 8px;
+font-size: 13px; font-weight: bold; cursor: pointer;
+background: #1a7a1a; color: white; transition: background 0.2s;
+}
+.phare-btn-acheter:hover { background: #155a15; }
+.phare-btn-epuise {
+width: 100%; padding: 9px; border: none; border-radius: 8px;
+font-size: 13px; font-weight: bold;
+background: #eee; color: #aaa; cursor: not-allowed;
+}
+body.dark .phare-btn-epuise { background: #333; color: #666; }
+.phares-voir-plus {
+text-align: center; margin-top: 20px;
+}
+.phares-voir-plus button {
+background: transparent; border: 2px solid #f5a623; color: #f5a623;
+padding: 12px 28px; border-radius: 50px; font-size: 15px; font-weight: bold;
+cursor: pointer; transition: all 0.2s;
+}
+.phares-voir-plus button:hover { background: #f5a623; color: white; }
+
+/* ===== BANNIÈRE INFO COMMANDE ===== */
+.info-commande-banner {
+  background: linear-gradient(135deg, #fff8e1, #fff3cd);
+  border-left: 4px solid #f5a623;
+  border-radius: 10px;
+  padding: 12px 15px;
+  margin-bottom: 18px;
+  font-size: 13.5px;
+  color: #7a5000;
+  line-height: 1.6;
+}
+body.dark .info-commande-banner {
+  background: rgba(245,166,35,0.12);
+  color: #f5c842;
+  border-left-color: #f5a623;
+}
+
+/* ===== RAPPEL INSCRIPTION PAGE PRODUITS ===== */
+.rappel-inscription {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, #fff8e1, #fff3cd);
+  border-left: 5px solid #f5a623;
+  border-radius: 0;
+  padding: 13px 20px;
+  font-size: 14px;
+  color: #7a5000;
+  margin: 0 0 0 0;
+}
+body.dark .rappel-inscription {
+  background: rgba(245,166,35,0.1);
+  color: #f5c842;
+  border-left-color: #f5a623;
+}
+.btn-rappel-inscrire {
+  background: #f5a623;
+  color: white;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+.btn-rappel-inscrire:hover { background: #e0921a; }
+/* Sur mobile : centrer le rappel */
+@media (max-width: 600px) {
+  .rappel-inscription { flex-direction: column; text-align: center; }
+}
+
+/* ===== FOOTER ===== */
+.footer-principal {
+background: #1a1a1a; color: #ccc;
+padding: 30px 20px 20px; margin-top: 30px;
+}
+.footer-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 20px; }
+.footer-bloc h3 { color: #f5a623; font-size: 16px; margin-bottom: 10px; }
+.footer-bloc p { font-size: 13px; line-height: 1.7; margin: 3px 0; }
+.footer-bloc a { color: #f5a623; text-decoration: none; }
+.footer-bas { text-align: center; font-size: 12px; color: #666; border-top: 1px solid #333; padding-top: 15px; }
+
+@media(min-width: 600px) {
+.footer-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+</style>
+</head>
+<body>
+
+<!-- NOTIFICATION -->
+
+<div id="notification" style="display:none;"></div>
+
+<!-- HEADER -->
+
+<header>
+  <div class="header-contenu">
+    <!-- LOGO -->
+    <div class="logo-miracle" onclick="allerSection('accueil')">🛍️ Miracle &amp; Co</div>
+
+    <!-- NAV DESKTOP (liens centraux) -->
+    <nav id="menu-nav" class="menu-cache">
+      <a href="#" onclick="allerSection('accueil')">🏠 ACCUEIL</a>
+      <a href="#" onclick="allerSection('produits')">🛍️ PRODUITS</a>
+      <a href="#" onclick="allerSection('apropos')">ℹ️ À PROPOS</a>
+      <a href="#" onclick="allerSection('panier-section')">🛒 PANIER <span id="badge-panier" class="badge-menu">0</span></a>
+      <a href="#" onclick="ouvrirConnexion()">🔐 CONNEXION</a>
+      <a href="tel:+2290150015355">📞 CONTACT</a>
+      <a href="#" onclick="toggleDarkMode()" id="btn-mode">🌙 Mode Nuit</a>
+    </nav>
+
+    <!-- ICÔNES DESKTOP (droite) -->
+    <div class="nav-icones-groupe">
+      <button class="nav-icone-btn" onclick="toggleDarkMode()" id="btn-mode-desktop" title="Mode nuit">🌙</button>
+      <button class="nav-icone-btn" onclick="ouvrirConnexion()" title="Connexion">🔐</button>
+      <button class="nav-icone-btn" onclick="allerSection('panier-section')" title="Panier" style="position:relative;">
+        🛒
+        <span id="badge-panier-desktop" class="badge-menu" style="display:none;">0</span>
+      </button>
+    </div>
+
+    <!-- HAMBURGER MOBILE -->
+    <div class="menu-hamburger" onclick="toggleMenu()">☰</div>
+  </div>
+</header>
+
+<!-- PANNEAU CONNEXION / INSCRIPTION -->
+
+<div id="panneau-connexion" style="display:none;">
+  <div class="connexion-box">
+    <div class="onglets-auth">
+      <button class="onglet-btn actif" id="btn-connexion-tab" onclick="switchTab('connexion')">Se connecter</button>
+      <button class="onglet-btn" id="btn-inscription-tab" onclick="switchTab('inscription')">S'inscrire</button>
+    </div>
+    <!-- Formulaire Connexion -->
+   <div id="form-connexion">
+      <h2>🔐 Connexion</h2>
+      <div class="info-commande-banner">
+        🛒 Pour passer une commande, vous devez être connecté à votre compte.
+      </div>
+      <input type="email" id="email-co" placeholder="Votre email">
+      <input type="password" id="mdp-co" placeholder="Votre mot de passe">
+      <button onclick="seConnecter()">Se connecter</button>
+      <button onclick="fermerConnexion()">Annuler</button>
+      <p id="msg-connexion"></p>
+    </div>
+    <!-- Formulaire Inscription -->
+    <div id="form-inscription" style="display:none;">
+      <h2>📝 Créer un compte</h2>
+      <div class="info-commande-banner">
+        🛒 <strong>Inscription obligatoire pour commander !</strong><br>
+        Créez votre compte gratuitement en quelques secondes pour pouvoir passer vos commandes sur Miracle &amp; Co.
+      </div>
+      <input type="text" id="prenom-ins" placeholder="Votre prénom">
+      <input type="email" id="email-ins" placeholder="Votre email">
+      <input type="password" id="mdp-ins" placeholder="Choisissez un mot de passe">
+      <button onclick="sInscrire()">Créer mon compte</button>
+      <button onclick="fermerConnexion()">Annuler</button>
+      <p id="msg-inscription"></p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE DETAIL PRODUIT (overlay) -->
+
+<div id="page-produit" style="display:none;">
+  <div class="produit-detail">
+    <button class="btn-fermer" onclick="fermerProduit()">← Retour aux produits</button>
+    <img id="detail-img" src="" alt="Produit">
+    <h2 id="detail-nom"></h2>
+    <div class="etoiles">⭐⭐⭐⭐⭐</div>
+    <div class="prix-detail" id="detail-prix"></div>
+    <span id="detail-stock" class="stock-badge en-stock"></span>
+    <p class="description-detail" id="detail-description"></p>
+    <div class="quantite-control">
+      <button onclick="changerQuantite(-1)">−</button>
+      <span id="quantite">1</span>
+      <button onclick="changerQuantite(1)">+</button>
+    </div>
+    <button class="btn-acheter" id="detail-acheter">🛒 Ajouter au panier</button>
+  </div>
+</div>
+
+<!-- ===================== PAGE : ACCUEIL ===================== -->
+
+<div id="page-accueil">
+
+  <!-- HERO DIAPORAMA -->
+
+  <section class="hero-slider">
+    <div class="slide active" style="background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('hero1.jpg') center/cover no-repeat;">
+      <div class="slide-content">
+        <h1>Bienvenue chez<br>Miracle &amp; Co</h1>
+        <p>Votre destination shopping préférée pour des produits de qualité</p>
+        <a class="btn-slide" href="#" onclick="allerSection('produits')">Découvrir nos produits →</a>
+        <div class="badges">
+          <span>🚚 Livraison rapide</span>
+          <span>🛡️ Paiement sécurisé</span>
+          <span>⭐ 4.9/5 (256 avis)</span>
+        </div>
+      </div>
+    </div>
+    <div class="slide" style="background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)), url('hero2.jpg') center/cover no-repeat;">
+      <div class="slide-content">
+        <h1>Import Chine à prix <span class="accent">imbattables</span></h1>
+        <p>Produits importés directement de Chine avec des prix défiant toute concurrence</p>
+        <a class="btn-slide" href="#" onclick="allerSection('produits')">Découvrir nos produits →</a>
+        <div class="badges">
+          <span>🚚 Livraison rapide</span>
+          <span>🛡️ Paiement sécurisé</span>
+          <span>⭐ 4.9/5 (256 avis)</span>
+        </div>
+      </div>
+    </div>
+    <div class="slide" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('hero3.jpg') center/cover no-repeat;">
+      <div class="slide-content">
+        <h1>Livraison rapide à<br>Cotonou &amp; Calavi</h1>
+        <p>Recevez vos commandes en moins de 48h dans toute la ville</p>
+        <a class="btn-slide" href="#" onclick="allerSection('produits')">Découvrir nos produits →</a>
+        <div class="badges">
+          <span>🚚 Livraison rapide</span>
+          <span>🛡️ Paiement sécurisé</span>
+          <span>⭐ 4.9/5 (256 avis)</span>
+        </div>
+      </div>
+    </div>
+    <div class="slide" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('hero4.jpg') center/cover no-repeat;">
+      <div class="slide-content">
+        <h1>Service client<br>exceptionnel</h1>
+        <p>Notre équipe est disponible pour répondre à toutes vos questions</p>
+        <a class="btn-slide" href="#" onclick="allerSection('produits')">Découvrir nos produits →</a>
+        <div class="badges">
+          <span>🚚 Livraison rapide</span>
+          <span>🛡️ Paiement sécurisé</span>
+          <span>⭐ 4.9/5 (256 avis)</span>
+        </div>
+      </div>
+    </div>
+    <div class="slider-dots">
+      <span class="dot active" onclick="allerSlide(0)"></span>
+      <span class="dot" onclick="allerSlide(1)"></span>
+      <span class="dot" onclick="allerSlide(2)"></span>
+      <span class="dot" onclick="allerSlide(3)"></span>
+    </div>
+  </section>
+  
+  <!-- PRODUITS PHARES -->
+  <section class="produits-phares">
+    <div class="produits-phares-titre">
+      <h2>🔥 Produits Phares</h2>
+      <p>Les articles les plus appréciés de notre boutique</p>
+    </div>
+    <div class="phares-grille">
+
+      <!-- DISPO -->
+      <div class="phare-card" onclick="allerSection('produits'); setTimeout(()=>ouvrirProduit('Montre A58plus',5000,'IMG-20260525-WA0020.jpg',true,'Montre Connectée de Luxe A58plus Compatible Android et iOS. Boitier en Alliage avec Ensemble de Bijoux : Collier, Boucles Oreilles, Bracelet et Bague.'),300)">
+        <span class="phare-badge-stock phare-badge-dispo">✅ Dispo</span>
+        <span class="phare-badge-promo">⭐ Populaire</span>
+        <div class="phare-img-wrap"><img src="IMG-20260525-WA0020.jpg" alt="Montre A58plus"></div>
+        <div class="phare-infos">
+          <p class="phare-nom">Montre Connectée A58plus + Bijoux</p>
+          <p class="phare-prix">5 000 FCFA</p>
+          <button class="phare-btn-acheter" onclick="event.stopPropagation(); allerSection('produits'); setTimeout(()=>verifierConnexionPourAchat('Montre A58plus',5000),300)">🛒 Acheter</button>
+        </div>
+      </div>
+
+      <div class="phare-card" onclick="allerSection('produits'); setTimeout(()=>ouvrirProduit('Coffret Parfum Yara',5000,'IMG-20260525-WA0013.jpg',true,'Coffret Cadeau de Parfum Yara - Élégance Florale Double Joie. Rose et Quatre Couleurs.'),300)">
+        <span class="phare-badge-stock phare-badge-dispo">✅ Dispo</span>
+        <span class="phare-badge-promo">🌸 Nouveau</span>
+        <div class="phare-img-wrap"><img src="IMG-20260525-WA0013.jpg" alt="Coffret Parfum Yara"></div>
+        <div class="phare-infos">
+          <p class="phare-nom">Coffret Parfum Yara</p>
+          <p class="phare-prix">5 000 FCFA</p>
+          <button class="phare-btn-acheter" onclick="event.stopPropagation(); allerSection('produits'); setTimeout(()=>verifierConnexionPourAchat('Coffret Parfum Yara',5000),300)">🛒 Acheter</button>
+        </div>
+      </div>
+
+      <div class="phare-card" onclick="allerSection('produits'); setTimeout(()=>ouvrirProduit('Tondeuse T9',3000,'IMG-20260525-WA0000.jpg',true,'Tondeuse à cheveux professionnelle rechargeable T9, rasoir de style vintage.'),300)">
+        <span class="phare-badge-stock phare-badge-dispo">✅ Dispo</span>
+        <div class="phare-img-wrap"><img src="IMG-20260525-WA0000.jpg" alt="Tondeuse T9"></div>
+        <div class="phare-infos">
+          <p class="phare-nom">Tondeuse T9 Professionnelle</p>
+          <p class="phare-prix">3 000 FCFA</p>
+          <button class="phare-btn-acheter" onclick="event.stopPropagation(); allerSection('produits'); setTimeout(()=>verifierConnexionPourAchat('Tondeuse T9',3000),300)">🛒 Acheter</button>
+        </div>
+      </div>
+
+      <div class="phare-card" onclick="allerSection('produits'); setTimeout(()=>ouvrirProduit('Coffret Cadeau',15000,'IMG-20260525-WA0008.jpg',true,'Coffret Cadeau Tasse Thermostatique et Bouteille Isotherme Céramique pour Thé et Café.'),300)">
+        <span class="phare-badge-stock phare-badge-dispo">✅ Dispo</span>
+        <span class="phare-badge-promo">🎁 Top vente</span>
+        <div class="phare-img-wrap"><img src="IMG-20260525-WA0008.jpg" alt="Coffret Cadeau"></div>
+        <div class="phare-infos">
+          <p class="phare-nom">Coffret Tasse Thermostatique</p>
+          <p class="phare-prix">15 000 FCFA</p>
+          <button class="phare-btn-acheter" onclick="event.stopPropagation(); allerSection('produits'); setTimeout(()=>verifierConnexionPourAchat('Coffret Cadeau',15000),300)">🛒 Acheter</button>
+        </div>
+      </div>
+
+      <!-- ÉPUISÉS -->
+      <div class="phare-card epuise">
+        <span class="phare-badge-stock phare-badge-epuise">❌ Épuisé</span>
+        <div class="phare-img-wrap"><img src="IMG-20260525-WA0022.jpg" alt="Montre LP34"></div>
+        <div class="phare-infos">
+          <p class="phare-nom">Montre Vintage Femme LP34</p>
+          <p class="phare-prix">4 500 FCFA</p>
+          <button class="phare-btn-epuise" disabled>Indisponible</button>
+        </div>
+      </div>
+
+      <div class="phare-card epuise">
+        <span class="phare-badge-stock phare-badge-epuise">❌ Épuisé</span>
+        <div class="phare-img-wrap"><img src="IMG-20260525-WA0003.jpg" alt="Sac à Main"></div>
+        <div class="phare-infos">
+          <p class="phare-nom">Sacs à Main Femme</p>
+          <p class="phare-prix">5 000 FCFA</p>
+          <button class="phare-btn-epuise" disabled>Indisponible</button>
+        </div>
+      </div>
+
+    </div>
+    <div class="phares-voir-plus">
+      <button onclick="allerSection('produits')">Voir tous les produits →</button>
+    </div>
+  </section>
+  
+  <!-- FOOTER ACCUEIL -->
+
+  <footer class="footer-principal">
+    <div class="footer-grid">
+      <div class="footer-bloc">
+        <h3>🛍️ Miracle &amp; Co</h3>
+        <p>Votre boutique de confiance à Cotonou &amp; Calavi. Produits importés directement de Chine à des prix imbattables. Qualité garantie, service irréprochable.</p>
+      </div>
+      <div class="footer-bloc">
+        <h3>🕐 Horaires d'ouverture</h3>
+        <p>🟢 Lundi – Samedi : 7h00 – 20h00</p>
+        <p>🔴 Dimanche : Fermé</p>
+      </div>
+      <div class="footer-bloc">
+        <h3>📍 Localisation &amp; Contact</h3>
+        <p>📌 Calavi, Cotonou – Bénin</p>
+        <p>📞 <a href="tel:+2290150015355">+229 01 50 01 53 55</a></p>
+        <p>📱 WhatsApp disponible</p>
+      </div>
+    </div>
+    <div class="footer-bas">© 2026 Miracle &amp; Co – Tous droits réservés.</div>
+  </footer>
+
+</div>
+
+<!-- ===================== PAGE : PRODUITS ===================== -->
+
+<div id="page-produits" style="display:none;">
+
+  <div class="page-titre">
+    <h2>🛍️ Nos Produits</h2>
+    <div class="barre-recherche" id="wrap-recherche">
+      <input type="text" id="champ-recherche"
+        placeholder="🔍 Rechercher un produit..."
+        oninput="rechercherProduit()"
+        onkeydown="naviguerSuggestions(event)"
+        autocomplete="off">
+      <button class="btn-effacer-recherche" id="btn-effacer" onclick="effacerRecherche()">✕</button>
+      <div id="liste-suggestions"></div>
+    </div>
+  </div>
+
+  <!-- MESSAGE INSCRIPTION -->
+  <div id="msg-inscription-rappel" class="rappel-inscription">
+    <span>🔐 Veuillez vous <strong>inscrire</strong> ou vous <strong>connecter</strong> avant de passer une commande.</span>
+    <button onclick="ouvrirConnexion(); setTimeout(()=>switchTab('inscription'),100)" class="btn-rappel-inscrire">S'inscrire maintenant →</button>
+  </div>
+
+  <!-- Filtres catégories -->
+  <div class="filtres-cats" id="filtres-cats">
+    <button class="filtre-btn actif" onclick="filtrerCategorie('', this)">Tout</button>
+    <button class="filtre-btn" onclick="filtrerCategorie('tondeuse rasoir', this)">✂️ Coiffure</button>
+    <button class="filtre-btn" onclick="filtrerCategorie('sac', this)">👜 Sacs</button>
+    <button class="filtre-btn" onclick="filtrerCategorie('bouteille mug tasse', this)">☕ Boissons</button>
+    <button class="filtre-btn" onclick="filtrerCategorie('parfum', this)">🌸 Parfums</button>
+    <button class="filtre-btn" onclick="filtrerCategorie('montre', this)">⌚ Montres</button>
+    <button class="filtre-btn" onclick="filtrerCategorie('coffret', this)">🎁 Coffrets</button>
+  </div>
+
+  <div id="resultat-recherche" class="msg-recherche" style="display:none;"></div>
+
+  <div class="grid" id="grille-produits">
+
+```
+<div class="card" data-nom="Tondeuse T9" onclick="ouvrirProduit('Tondeuse T9', 3000, 'IMG-20260525-WA0000.jpg', true, 'Tondeuse à cheveux professionnelle rechargeable T9, tondeuse électrique pour hommes, rasoir de style vintage. Idéale pour un coiffage précis et professionnel.')">
+  <img src="IMG-20260525-WA0000.jpg" alt="Tondeuse T9">
+  <h3>Tondeuse T9</h3>
+  <p>3000 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Tondeuse T9', 3000)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Sacs à Main Femme" onclick="ouvrirProduit('Sacs à Main', 5000, 'IMG-20260525-WA0003.jpg', true, 'Nouveaux Sacs à Main Femme, Sacs Bandoulière Mixte Aléatoire. Ancien stock de qualité, design moderne et élégant pour toutes occasions.')">
+  <img src="IMG-20260525-WA0003.jpg" alt="Sacs à Main">
+  <h3>Sacs à Main Femme</h3>
+  <p>5000 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Sacs à Main', 5000)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Bouteille eau givré" onclick="ouvrirProduit('Bouteille eau givré', 1000, 'IMG-20260525-WA0004.jpg', true, 'Bouteille en verre givré coloré à changement de couleur avec couvercle. Personnalisable avec logo, vente en gros LOVFE. Design original et moderne.')">
+  <img src="IMG-20260525-WA0004.jpg" alt="Bouteille">
+  <h3>Bouteille d'eau en verre givré</h3>
+  <p>1000 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Bouteille eau givré', 1000)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Mug à café" onclick="ouvrirProduit('Mug à café', 1500, 'IMG-20260525-WA0005.jpg', true, 'Mug à café anti-brûlure en bambou et cuir, design simple et élégant. Livré avec paille et bouteille en verre borosilicate de haute qualité avec couvercle.')">
+  <img src="IMG-20260525-WA0005.jpg" alt="Mug">
+  <h3>Mug à café bambou et cuir</h3>
+  <p>1500 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Mug à café', 1500)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Bouteille portable" onclick="ouvrirProduit('Bouteille portable', 2000, 'IMG-20260525-WA0007.jpg', true, 'Bouteille portable en verre double paroi de haute qualité, personnalisable avec logo. Disponible en plusieurs couleurs, idéale pour voyage en extérieur.')">
+  <img src="IMG-20260525-WA0007.jpg" alt="Bouteille portable">
+  <h3>Bouteille d'eau portable en verre</h3>
+  <p>2000 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Bouteille portable', 2000)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Coffret Cadeau Tasse Thermostatique" onclick="ouvrirProduit('Coffret Cadeau', 15000, 'IMG-20260525-WA0008.jpg', true, 'Coffret Cadeau de Tasse Thermostatique et Bouteille Isotherme Céramique pour Thé et Café. Idéal pour la Fête des Mères, Saint-Valentin et Mariage.')">
+  <img src="IMG-20260525-WA0008.jpg" alt="Coffret Cadeau">
+  <h3>Coffret Cadeau Tasse Thermostatique</h3>
+  <p>15000 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Coffret Cadeau', 15000)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Coffret Isotherme" onclick="ouvrirProduit('Coffret Isotherme', 5000, 'IMG-20260525-WA0009.jpg', true, 'Coffret Cadeau 3 Pièces Bouteille Isotherme pour Voyage Extérieur, Café et Thé. En Acier Inoxydable avec 2 Tasses incluses. Marque LOVFE.')">
+  <img src="IMG-20260525-WA0009.jpg" alt="Coffret Isotherme">
+  <h3>Coffret 3 Pièces Bouteille Isotherme</h3>
+  <p>5000 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Coffret Isotherme', 5000)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Tasses à Café voyage" onclick="ouvrirProduit('Tasses à Café', 4500, 'IMG-20260525-WA0010.jpg', true, 'Tasses à café de voyage avec poignée, revêtement poudré 20 oz. En métal acier inoxydable isotherme. Idéale pour garder vos boissons chaudes en déplacement.')">
+  <img src="IMG-20260525-WA0010.jpg" alt="Tasses">
+  <h3>Tasses à café de voyage</h3>
+  <p>4500 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Tasses à Café', 4500)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Bonnet de Nuit Soie" onclick="ouvrirProduit('Bonnet de nuit', 1000, 'IMG-20260525-WA0011.jpg', true, 'Bonnet de Nuit en Soie pour Femmes, Double Couche en Satin Réglable. Cache-Tête et Chapeau de Douche pour Cheveux Bouclés. Accessoire de Coiffure indispensable.')">
+  <img src="IMG-20260525-WA0011.jpg" alt="Bonnet">
+  <h3>Bonnet de Nuit en Soie</h3>
+  <p>1000 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Bonnet de nuit', 1000)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Écailleur Manuel Créatif" onclick="ouvrirProduit('Écailleur Manuel', 1000, 'IMG-20260525-WA0012.jpg', true, 'Écailleur Manuel Créatif avec Couvercle en Plastique Amovible pour Cuisine. Forme Ergonomique, compatible Lave-Vaisselle et Micro-Ondes. Durable et pratique.')">
+  <img src="IMG-20260525-WA0012.jpg" alt="Écailleur">
+  <h3>Écailleur Manuel Créatif</h3>
+  <p>1000 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Écailleur Manuel', 1000)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Coffret Parfum Yara" onclick="ouvrirProduit('Coffret Parfum Yara', 5000, 'IMG-20260525-WA0013.jpg', true, 'Coffret Cadeau de Parfum Yara - Élégance Florale Double Joie. Rose et Quatre Couleurs pour un Plaisir Sensoriel Visuel et Olfactif. Cadeau idéal pour femme.')">
+  <img src="IMG-20260525-WA0013.jpg" alt="Parfum Yara">
+  <h3>Coffret Parfum Yara</h3>
+  <p>5000 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Coffret Parfum Yara', 5000)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Parfum Arabe Femme" onclick="ouvrirProduit('Parfum Arabe', 5000, 'IMG-20260525-WA0014.jpg', true, 'Parfum Arabe Femme 25ml x 4pcs Nouvelle Collection. Coffret Cadeau Élégant au Parfum Oriental Mystérieux. Vente Chaude, longue durée.')">
+  <img src="IMG-20260525-WA0014.jpg" alt="Parfum Arabe">
+  <h3>Parfum Arabe Femme</h3>
+  <p>5000 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Parfum Arabe', 5000)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Parfums Haute Qualité" onclick="ouvrirProduit('Parfums Qualité', 5000, 'IMG-20260525-WA0015.jpg', true, 'Lots de Gros Parfums de Haute Qualité, Brumes Corporelles, Sets de Voyage et Mini Parfums Longue Durée pour Femmes. Marque Privée, senteurs envoûtantes.')">
+  <img src="IMG-20260525-WA0015.jpg" alt="Parfums">
+  <h3>Parfums de Haute Qualité</h3>
+  <p>5000 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Parfums Qualité', 5000)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Sac à dos multifonctionnel" onclick="ouvrirProduit('Sac à dos', 5000, 'IMG-20260525-WA0017.jpg', true, 'Sac à dos de voyage pour hommes, grande capacité pour étudiants. Multifonctionnel pour ordinateur portable. Design résistant et pratique pour le quotidien.')">
+  <img src="IMG-20260525-WA0017.jpg" alt="Sac à dos">
+  <h3>Sac à dos multifonctionnel</h3>
+  <p>5000 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Sac à dos', 5000)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Grand sac à dos imperméable" onclick="ouvrirProduit('Sac dos imperméable', 5000, 'IMG-20260525-WA0018.jpg', true, 'Grand sac à dos imperméable pour ordinateur portable. Fermeture à glissière en matériau Oxford anti-vol. Black Business Design, élégant et sécurisé.')">
+  <img src="IMG-20260525-WA0018.jpg" alt="Sac imperméable">
+  <h3>Grand sac à dos imperméable</h3>
+  <p>5000 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Sac dos imperméable', 5000)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Sac à dos scolaire imperméable" onclick="ouvrirProduit('Sac scolaire', 5000, 'IMG-20260525-WA0019.jpg', true, 'Sac à dos scolaire design imperméable pour adolescentes. En matériau Oxford avec motif de lettres et fermeture à glissière. Tendance et résistant.')">
+  <img src="IMG-20260525-WA0019.jpg" alt="Sac scolaire">
+  <h3>Sac à dos scolaire imperméable</h3>
+  <p>5000 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Sac scolaire', 5000)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Montre Connectée A58plus" onclick="ouvrirProduit('Montre A58plus', 5000, 'IMG-20260525-WA0020.jpg', true, 'Montre Connectée de Luxe A58plus Compatible Android et iOS. Boitier en Alliage avec Ensemble de Bijoux : Collier, Boucles Oreilles, Bracelet et Bague. Cadeau Parfait pour filles.')">
+  <img src="IMG-20260525-WA0020.jpg" alt="Montre A58">
+  <h3>Montre Connectée A58plus</h3>
+  <p>5000 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Montre A58plus', 5000)">Acheter</button>
+</div>
+
+<div class="card" data-nom="Montre vintage femme LP34" onclick="ouvrirProduit('Montre LP34', 4500, 'IMG-20260525-WA0022.jpg', true, 'Montre ronde vintage pour femme LP34, ensemble de cinq pièces. Bracelet en cuir et alliage, mode et commerce extérieur. Plusieurs styles disponibles, vente chaude.')">
+  <img src="IMG-20260525-WA0022.jpg" alt="Montre LP34">
+  <h3>Montre vintage femme LP34</h3>
+  <p>4500 FCFA</p>
+  <button onclick="event.stopPropagation(); verifierConnexionPourAchat('Montre LP34', 4500)">Acheter</button>
+</div>
+```
+
+  </div>
+  
+  <!-- FOOTER PRODUITS -->
+
+  <footer class="footer-principal">
+    <div class="footer-grid">
+      <div class="footer-bloc">
+        <h3>🛍️ Miracle &amp; Co</h3>
+        <p>Votre boutique de confiance à Cotonou &amp; Calavi. Produits importés directement de Chine à des prix imbattables.</p>
+      </div>
+      <div class="footer-bloc">
+        <h3>🕐 Horaires d'ouverture</h3>
+        <p>🟢 Lundi – Samedi : 7h00 – 20h00</p>
+        <p>🔴 Dimanche : Fermé</p>
+      </div>
+      <div class="footer-bloc">
+        <h3>📍 Localisation &amp; Contact</h3>
+        <p>📌 Calavi, Cotonou – Bénin</p>
+        <p>📞 <a href="tel:+2290150015355">+229 01 50 01 53 55</a></p>
+      </div>
+    </div>
+    <div class="footer-bas">© 2026 Miracle &amp; Co – Tous droits réservés.</div>
+  </footer>
+
+</div>
+
+<!-- ===================== PAGE : À PROPOS ===================== -->
+
+<div id="page-apropos" style="display:none;">
+  <div class="apropos-container">
+
+```
+<div class="apropos-hero">
+  <h1>✨ Miracle &amp; Co</h1>
+  <p class="apropos-slogan">Votre bonheur, notre mission.</p>
+</div>
+
+<div class="apropos-bloc">
+  <h2>🌟 Qui sommes-nous ?</h2>
+  <p>Miracle &amp; Co est une boutique en ligne basée à Cotonou &amp; Calavi, au Bénin, fondée avec une vision simple : <strong>rendre accessible à tous des produits de qualité à des prix imbattables</strong>. Nous importons directement depuis la Chine pour vous offrir le meilleur sans intermédiaire.</p>
+</div>
+
+<div class="apropos-bloc apropos-orange">
+  <h2>🚀 Notre Mission</h2>
+  <p>Nous croyons que chaque personne mérite de bons produits sans se ruiner. C'est pourquoi nous travaillons chaque jour à sélectionner, importer et livrer des articles utiles, tendance et durables — directement chez vous.</p>
+</div>
+
+<div class="apropos-avantages">
+  <h2>💎 Pourquoi choisir Miracle &amp; Co ?</h2>
+  <div class="avantage-grid">
+    <div class="avantage-card">
+      <div class="av-icon">🚚</div>
+      <h3>Livraison Rapide</h3>
+      <p>Vos commandes livrées en <strong>moins de 48h</strong> à Cotonou &amp; Calavi. On ne vous fait pas attendre.</p>
+    </div>
+    <div class="avantage-card">
+      <div class="av-icon">💳</div>
+      <h3>Paiement à la Livraison</h3>
+      <p>Vous payez uniquement quand vous recevez votre colis. <strong>Zéro risque, zéro stress.</strong></p>
+    </div>
+    <div class="avantage-card">
+      <div class="av-icon">🛡️</div>
+      <h3>Qualité Garantie</h3>
+      <p>Chaque produit est sélectionné avec soin. Votre satisfaction est notre <strong>priorité absolue.</strong></p>
+    </div>
+    <div class="avantage-card">
+      <div class="av-icon">⭐</div>
+      <h3>4.9/5 de Satisfaction</h3>
+      <p>Plus de <strong>256 clients satisfaits</strong> ont fait confiance à Miracle &amp; Co. Rejoignez la famille !</p>
+    </div>
+    <div class="avantage-card">
+      <div class="av-icon">💰</div>
+      <h3>Prix Imbattables</h3>
+      <p>Import direct depuis la Chine = <strong>économies réelles</strong> pour vous. Pas de surcoût, pas de surprise.</p>
+    </div>
+    <div class="avantage-card">
+      <div class="av-icon">📞</div>
+      <h3>Service Client Réactif</h3>
+      <p>Une question ? Une commande ? Notre équipe est <strong>disponible 6j/7</strong> pour vous répondre.</p>
+    </div>
+  </div>
+</div>
+
+<div class="apropos-bloc apropos-dark">
+  <h2>💬 Ils nous font confiance</h2>
+  <div class="temoignages">
+    <div class="temoignage">
+      <p>"Livraison en 24h chrono ! Les produits sont exactement comme sur les photos. Je recommande vivement Miracle &amp; Co !"</p>
+      <strong>— Adjoua M., Cotonou</strong>
+    </div>
+    <div class="temoignage">
+      <p>"Les prix sont vraiment imbattables. J'ai commandé 3 fois déjà et je suis toujours satisfait. Service client au top !"</p>
+      <strong>— Kofi B., Calavi</strong>
+    </div>
+    <div class="temoignage">
+      <p>"J'ai offert le coffret parfum à ma femme pour son anniversaire, elle a adoré ! Emballage soigné et livraison rapide."</p>
+      <strong>— Rodrigue A., Cotonou</strong>
+    </div>
+  </div>
+</div>
+
+<div class="apropos-cta">
+  <h2>🛍️ Prêt à commander ?</h2>
+  <p>Rejoignez des centaines de clients satisfaits et profitez de nos offres exclusives.</p>
+  <button class="btn-cta" onclick="allerSection('produits')">Voir nos produits →</button>
+</div>
+```
+
+  </div>
+  
+  <!-- FOOTER À PROPOS -->
+
+  <footer class="footer-principal">
+    <div class="footer-grid">
+      <div class="footer-bloc">
+        <h3>🛍️ Miracle &amp; Co</h3>
+        <p>Votre boutique de confiance à Cotonou &amp; Calavi.</p>
+      </div>
+      <div class="footer-bloc">
+        <h3>🕐 Horaires d'ouverture</h3>
+        <p>🟢 Lundi – Samedi : 7h00 – 20h00</p>
+        <p>🔴 Dimanche : Fermé</p>
+      </div>
+      <div class="footer-bloc">
+        <h3>📍 Contact</h3>
+        <p>📞 <a href="tel:+2290150015355">+229 01 50 01 53 55</a></p>
+        <p>📱 WhatsApp disponible</p>
+      </div>
+    </div>
+    <div class="footer-bas">© 2026 Miracle &amp; Co – Tous droits réservés.</div>
+  </footer>
+
+</div>
+
+<!-- ===================== PAGE : PANIER ===================== -->
+
+<div id="page-panier-section" style="display:none;">
+  <div class="panier-container">
+    <h2>🛒 Mon Panier</h2>
+    <div id="panier-vide-msg" class="panier-vide">
+      Votre panier est vide. <a href="#" onclick="allerSection('produits')">Voir les produits →</a>
+    </div>
+    <ul id="liste-panier-page"></ul>
+    <div id="panier-total-bloc" style="display:none;">
+      <p class="panier-total">Total : <span id="total-page">0</span> FCFA</p>
+      <button class="btn-vider" onclick="viderPanier()">🗑️ Vider le panier</button>
+      <button class="btn-valider" onclick="validerPanier()">
+        <span>✅ Commander via WhatsApp</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- FOOTER PANIER -->
+
+  <footer class="footer-principal">
+    <div class="footer-grid">
+      <div class="footer-bloc">
+        <h3>🛍️ Miracle &amp; Co</h3>
+        <p>Votre boutique de confiance à Cotonou &amp; Calavi.</p>
+      </div>
+      <div class="footer-bloc">
+        <h3>🕐 Horaires d'ouverture</h3>
+        <p>🟢 Lundi – Samedi : 7h00 – 20h00</p>
+        <p>🔴 Dimanche : Fermé</p>
+      </div>
+      <div class="footer-bloc">
+        <h3>📍 Contact</h3>
+        <p>📞 <a href="tel:+2290150015355">+229 01 50 01 53 55</a></p>
+        <p>📱 WhatsApp disponible</p>
+      </div>
+    </div>
+    <div class="footer-bas">© 2026 Miracle &amp; Co – Tous droits réservés.</div>
+  </footer>
+</div>
+
+<!-- BANDEAU BAS -->
+
+<div class="bandeau-info">
+  <span class="contenu">🚚 Livraison rapide à Cotonou &amp; Calavi &nbsp;&nbsp;|&nbsp;&nbsp; 💰 Paiement à la livraison &nbsp;&nbsp;|&nbsp;&nbsp; 📞 +229 01 50 01 53 55 &nbsp;&nbsp;|&nbsp;&nbsp; ⭐ 4.9/5 sur 256 avis &nbsp;&nbsp;|&nbsp;&nbsp; 🛍️ Miracle &amp; Co – Votre bonheur, notre mission &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+</div>
+
+<!-- ✅ CORRECTION PRINCIPALE : balise script ajoutée -->
+
+<script>
+// ================================================
+// MIRACLE & CO — script.js CORRIGÉ ET COMPLET
+// ================================================
+
+var panier = [];
+var utilisateurConnecte = null;
+
+// ===== CHARGEMENT UTILISATEUR =====
+// CORRECTION : localStorage peut être bloqué sur certains navigateurs/contextes
+// On sécurise chaque accès avec try/catch
+function sauvegarderLocal(cle, valeur) {
+  try {
+    localStorage.setItem(cle, JSON.stringify(valeur));
+  } catch(e) {
+    console.warn("localStorage non disponible :", e);
+  }
+}
+
+function lireLocal(cle) {
+  try {
+    var val = localStorage.getItem(cle);
+    return val ? JSON.parse(val) : null;
+  } catch(e) {
+    return null;
+  }
+}
+
+// Charger utilisateur connecté
+utilisateurConnecte = lireLocal("utilisateur");
+
+// ===== NAVIGATION =====
+function allerSection(section) {
+  // CORRECTION : liste complète des pages incluant "panier-section"
+  var pages = ["accueil", "produits", "apropos", "panier-section"];
+  for (var i = 0; i < pages.length; i++) {
+    var el = document.getElementById("page-" + pages[i]);
+    if (el) el.style.display = "none";
+  }
+  var cible = document.getElementById("page-" + section);
+  if (cible) {
+    cible.style.display = "block";
+  } else {
+    console.warn("Page introuvable : page-" + section);
+  }
+  window.scrollTo(0, 0);
+  var menu = document.getElementById("menu-nav");
+  if (menu) menu.classList.remove("menu-ouvert");
+  if (section === "panier-section") afficherPanierPage();
+}
+
+// ===== MENU =====
+function toggleMenu() {
+  var menu = document.getElementById("menu-nav");
+  if (!menu) return;
+  if (menu.classList.contains("menu-ouvert")) {
+    menu.classList.remove("menu-ouvert");
+  } else {
+    menu.classList.add("menu-ouvert");
+  }
+}
+
+document.addEventListener("click", function(e) {
+  var menu = document.getElementById("menu-nav");
+  var hamburger = document.querySelector(".menu-hamburger");
+  if (menu && hamburger) {
+    if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
+      menu.classList.remove("menu-ouvert");
+    }
+  }
+});
+
+// ===== MODE NUIT =====
+function toggleDarkMode() {
+  document.body.classList.toggle("dark");
+  var isDark = document.body.classList.contains("dark");
+  var btn = document.getElementById("btn-mode");
+  if (btn) btn.textContent = isDark ? "☀️ Mode Jour" : "🌙 Mode Nuit";
+  var btnD = document.getElementById("btn-mode-desktop");
+  if (btnD) btnD.textContent = isDark ? "☀️" : "🌙";
+}
+
+// ===== CONNEXION / INSCRIPTION =====
+function ouvrirConnexion() {
+  var p = document.getElementById("panneau-connexion");
+  if (p) p.style.display = "flex";
+  var menu = document.getElementById("menu-nav");
+  if (menu) menu.classList.remove("menu-ouvert");
+}
+
+function fermerConnexion() {
+  var p = document.getElementById("panneau-connexion");
+  if (p) p.style.display = "none";
+}
+
+function switchTab(onglet) {
+  var fc = document.getElementById("form-connexion");
+  var fi = document.getElementById("form-inscription");
+  var tc = document.getElementById("btn-connexion-tab");
+  var ti = document.getElementById("btn-inscription-tab");
+  if (!fc || !fi || !tc || !ti) return;
+  if (onglet === "connexion") {
+    fc.style.display = "block";
+    fi.style.display = "none";
+    tc.classList.add("actif");
+    ti.classList.remove("actif");
+  } else {
+    fc.style.display = "none";
+    fi.style.display = "block";
+    ti.classList.add("actif");
+    tc.classList.remove("actif");
+  }
+}
+
+function seConnecter() {
+  var email = document.getElementById("email-co").value.trim();
+  var mdp = document.getElementById("mdp-co").value;
+  var msg = document.getElementById("msg-connexion");
+  if (!email || !mdp) {
+    msg.style.color = "red";
+    msg.textContent = "⚠️ Remplis tous les champs !";
+    return;
+  }
+  var comptes = lireLocal("comptes") || [];
+  var compte = null;
+  for (var i = 0; i < comptes.length; i++) {
+    if (comptes[i].email === email && comptes[i].mdp === mdp) {
+      compte = comptes[i]; break;
+    }
+  }
+  if (!compte) {
+    msg.style.color = "red";
+    msg.textContent = "❌ Email ou mot de passe incorrect.";
+    return;
+  }
+  utilisateurConnecte = { email: compte.email, prenom: compte.prenom };
+  sauvegarderLocal("utilisateur", utilisateurConnecte);
+  msg.style.color = "#4CAF50";
+  msg.textContent = "✅ Bienvenue " + compte.prenom + " !";
+  setTimeout(function() { fermerConnexion(); majRappelInscription(); }, 1500);
+}
+
+function sInscrire() {
+  var prenom = document.getElementById("prenom-ins").value.trim();
+  var email = document.getElementById("email-ins").value.trim();
+  var mdp = document.getElementById("mdp-ins").value;
+  var msg = document.getElementById("msg-inscription");
+  if (!prenom || !email || !mdp) {
+    msg.style.color = "red";
+    msg.textContent = "⚠️ Remplis tous les champs !";
+    return;
+  }
+  if (mdp.length < 6) {
+    msg.style.color = "red";
+    msg.textContent = "⚠️ Mot de passe trop court (6 caractères min).";
+    return;
+  }
+  var comptes = lireLocal("comptes") || [];
+  for (var i = 0; i < comptes.length; i++) {
+    if (comptes[i].email === email) {
+      msg.style.color = "red";
+      msg.textContent = "❌ Cet email est déjà utilisé.";
+      return;
+    }
+  }
+  comptes.push({ prenom: prenom, email: email, mdp: mdp });
+  sauvegarderLocal("comptes", comptes);
+  utilisateurConnecte = { email: email, prenom: prenom };
+  sauvegarderLocal("utilisateur", utilisateurConnecte);
+  msg.style.color = "#4CAF50";
+  msg.textContent = "✅ Compte créé ! Bienvenue " + prenom + " !";
+  setTimeout(function() { fermerConnexion(); }, 1500);
+}
+
+// ===== NOTIFICATION =====
+function afficherNotification(texte) {
+  var notif = document.getElementById("notification");
+  if (!notif) return;
+  notif.textContent = texte;
+  notif.style.display = "block";
+  setTimeout(function() { notif.style.display = "none"; }, 3000);
+}
+
+// ===== PANIER =====
+function verifierConnexionPourAchat(nom, prix) {
+  if (!utilisateurConnecte) {
+    afficherNotification("🔐 Connectez-vous pour acheter !");
+    setTimeout(function() { ouvrirConnexion(); }, 800);
+    return;
+  }
+  ajouterAuPanier(nom, prix);
+}
+
+function ajouterAuPanier(nom, prix) {
+  var existant = null;
+  for (var i = 0; i < panier.length; i++) {
+    if (panier[i].nom === nom) { existant = panier[i]; break; }
+  }
+  if (existant) {
+    existant.quantite++;
+  } else {
+    panier.push({ nom: nom, prix: prix, quantite: 1 });
+  }
+  mettreAJourCompteur();
+  afficherNotification("✅ " + nom + " ajouté au panier !");
+}
+
+function mettreAJourCompteur() {
+  var total = 0;
+  for (var i = 0; i < panier.length; i++) total += panier[i].quantite;
+  var el = document.getElementById("badge-panier");
+  if (el) el.textContent = total;
+  var elD = document.getElementById("badge-panier-desktop");
+  if (elD) {
+    elD.textContent = total;
+    elD.style.display = total > 0 ? "block" : "none";
+  }
+}
+
+function afficherPanierPage() {
+  var liste = document.getElementById("liste-panier-page");
+  var totalEl = document.getElementById("total-page");
+  var videMsg = document.getElementById("panier-vide-msg");
+  var totalBloc = document.getElementById("panier-total-bloc");
+  if (!liste) return;
+  liste.innerHTML = "";
+  var total = 0;
+  if (panier.length === 0) {
+    if (videMsg) videMsg.style.display = "block";
+    if (totalBloc) totalBloc.style.display = "none";
+    return;
+  }
+  if (videMsg) videMsg.style.display = "none";
+  if (totalBloc) totalBloc.style.display = "block";
+  for (var i = 0; i < panier.length; i++) {
+    var p = panier[i];
+    var li = document.createElement("li");
+    // CORRECTION : utilisation de data-index pour éviter les bugs de closure en boucle
+    li.innerHTML = '<span class="li-nom">' + p.nom + ' x' + p.quantite + '</span>'
+      + '<span class="li-prix">' + (p.prix * p.quantite) + ' FCFA</span>'
+      + '<button class="btn-suppr" data-index="' + i + '">✕</button>';
+    liste.appendChild(li);
+    total += p.prix * p.quantite;
+  }
+  
+  // CORRECTION : event delegation pour les boutons supprimer
+  liste.onclick = function(e) {
+    var btn = e.target.closest(".btn-suppr");
+    if (btn) {
+      var idx = parseInt(btn.getAttribute("data-index"), 10);
+      supprimerDuPanier(idx);
+    }
+  };
+  if (totalEl) totalEl.textContent = total;
+}
+
+function supprimerDuPanier(index) {
+  panier.splice(index, 1);
+  mettreAJourCompteur();
+  afficherPanierPage();
+}
+
+function viderPanier() {
+  panier = [];
+  mettreAJourCompteur();
+  afficherPanierPage();
+}
+
+function validerPanier() {
+  if (!utilisateurConnecte) {
+    afficherNotification("🔐 Connectez-vous pour valider !");
+    setTimeout(function() { ouvrirConnexion(); }, 800);
+    return;
+  }
+  if (panier.length === 0) {
+    afficherNotification("⚠️ Votre panier est vide !");
+    return;
+  }
+  var message = "🛍️ *Nouvelle commande - Miracle & Co*\n\n";
+  message += "👤 Client : " + utilisateurConnecte.prenom + " (" + utilisateurConnecte.email + ")\n\n";
+  message += "📦 *Articles commandés :*\n";
+  var total = 0;
+  for (var i = 0; i < panier.length; i++) {
+    var p = panier[i];
+    message += "• " + p.nom + " x" + p.quantite + " = " + (p.prix * p.quantite) + " FCFA\n";
+    total += p.prix * p.quantite;
+  }
+  message += "\n💰 *Total : " + total + " FCFA*";
+  message += "\n📌 Paiement à la livraison";
+  var url = "https://wa.me/2290150015355?text=" + encodeURIComponent(message);
+  window.location.href = url;
+}
+
+// ===== DONNÉES PRODUITS (pour suggestions) =====
+var PRODUITS = [
+  { nom: "Tondeuse T9", prix: 3000, image: "IMG-20260525-WA0000.jpg", enStock: true, cats: "tondeuse rasoir coiffure homme", description: "Tondeuse à cheveux professionnelle rechargeable T9, rasoir de style vintage. Idéale pour un coiffage précis et professionnel." },
+  { nom: "Sacs à Main", prix: 5000, image: "IMG-20260525-WA0003.jpg", enStock: true, cats: "sac main femme bandoulière", description: "Nouveaux Sacs à Main Femme, Sacs Bandoulière Mixte Aléatoire. Ancien stock de qualité, design moderne et élégant pour toutes occasions." },
+  { nom: "Bouteille eau givré", prix: 1000, image: "IMG-20260525-WA0004.jpg", enStock: true, cats: "bouteille verre eau boisson", description: "Bouteille en verre givré coloré à changement de couleur avec couvercle. Personnalisable avec logo." },
+  { nom: "Mug à café", prix: 1500, image: "IMG-20260525-WA0005.jpg", enStock: true, cats: "mug tasse café bambou cuir boisson", description: "Mug à café anti-brûlure en bambou et cuir, design simple et élégant. Livré avec paille et bouteille en verre." },
+  { nom: "Bouteille portable", prix: 1500, image: "IMG-20260525-WA0007.jpg", enStock: true, cats: "bouteille verre eau portable voyage boisson", description: "Bouteille portable en verre double paroi de haute qualité, personnalisable avec logo." },
+  { nom: "Coffret Cadeau", prix: 15000, image: "IMG-20260525-WA0008.jpg", enStock: true, cats: "coffret cadeau tasse thermostatique bouteille isotherme thé café", description: "Coffret Cadeau de Tasse Thermostatique et Bouteille Isotherme Céramique pour Thé et Café. Fête des Mères, Saint-Valentin." },
+  { nom: "Coffret Isotherme", prix: 5000, image: "IMG-20260525-WA0009.jpg", enStock: true, cats: "coffret isotherme bouteille acier tasse voyage", description: "Coffret Cadeau 3 Pièces Bouteille Isotherme pour Voyage Extérieur, Café et Thé. En Acier Inoxydable avec 2 Tasses." },
+  { nom: "Tasses à Café", prix: 4500, image: "IMG-20260525-WA0010.jpg", enStock: true, cats: "tasse café voyage isotherme acier boisson", description: "Tasses à café de voyage avec poignée, revêtement poudré 20 oz. Acier inoxydable isotherme." },
+  { nom: "Bonnet de nuit", prix: 1000, image: "IMG-20260525-WA0011.jpg", enStock: true, cats: "bonnet nuit soie femme cheveux satin", description: "Bonnet de Nuit en Soie pour Femmes, Double Couche en Satin Réglable. Accessoire Coiffure." },
+  { nom: "Écailleur Manuel", prix: 1000, image: "IMG-20260525-WA0012.jpg", enStock: true, cats: "écailleur poisson cuisine ustensile", description: "Écailleur Manuel Créatif avec Couvercle en Plastique Amovible pour Cuisine. Forme Ergonomique." },
+  { nom: "Coffret Parfum Yara", prix: 5000, image: "IMG-20260525-WA0013.jpg", enStock: true, cats: "parfum coffret yara floral femme cadeau", description: "Coffret Cadeau de Parfum Yara - Élégance Florale Double Joie. Rose et Quatre Couleurs." },
+  { nom: "Parfum Arabe", prix: 5000, image: "IMG-20260525-WA0014.jpg", enStock: true, cats: "parfum arabe femme oriental coffret", description: "Parfum Arabe Femme 25ml x 4pcs Nouvelle Collection. Coffret Cadeau Élégant au Parfum Oriental Mystérieux." },
+  { nom: "Parfums Qualité", prix: 5000, image: "IMG-20260525-WA0015.jpg", enStock: true, cats: "parfum haute qualité femme brume lot", description: "Lots de Gros Parfums de Haute Qualité, Brumes Corporelles, Sets de Voyage et Mini Parfums Longue Durée pour Femmes." },
+  { nom: "Sac à dos", prix: 5000, image: "IMG-20260525-WA0017.jpg", enStock: true, cats: "sac dos voyage homme étudiant ordinateur", description: "Sac à dos de voyage pour hommes, grande capacité pour étudiants. Multifonctionnel pour ordinateur portable." },
+  { nom: "Sac dos imperméable", prix: 5000, image: "IMG-20260525-WA0018.jpg", enStock: true, cats: "sac dos imperméable ordinateur business oxford", description: "Grand sac à dos imperméable pour ordinateur portable. Fermeture anti-vol, Black Business Design." },
+  { nom: "Sac scolaire", prix: 5000, image: "IMG-20260525-WA0019.jpg", enStock: true, cats: "sac dos scolaire adolescente imperméable oxford", description: "Sac à dos scolaire design imperméable pour adolescentes. En matériau Oxford, tendance et résistant." },
+  { nom: "Montre A58plus", prix: 5000, image: "IMG-20260525-WA0020.jpg", enStock: true, cats: "montre connectée bijoux collier boucles bague femme fille", description: "Montre Connectée de Luxe A58plus Compatible Android et iOS. Avec Collier, Boucles Oreilles, Bracelet et Bague." },
+  { nom: "Montre LP34", prix: 4500, image: "IMG-20260525-WA0022.jpg", enStock: true, cats: "montre vintage femme cuir alliage", description: "Montre ronde vintage pour femme LP34, ensemble de cinq pièces. Bracelet en cuir et alliage." }
+];
+
+var indexSuggestionActif = -1;
+
+// ===== RECHERCHE INTELLIGENTE =====
+function rechercherProduit() {
+  var champEl = document.getElementById("champ-recherche");
+  var btnEffacer = document.getElementById("btn-effacer");
+  var suggestions = document.getElementById("liste-suggestions");
+  var msgEl = document.getElementById("resultat-recherche");
+  if (!champEl) return;
+
+  var query = champEl.value.trim();
+  var queryLower = query.toLowerCase();
+
+  // Bouton effacer
+  if (btnEffacer) btnEffacer.style.display = query ? "block" : "none";
+
+  // Filtrer les produits dans la grille principale
+  var cards = document.querySelectorAll("#grille-produits .card");
+  var nbVisible = 0;
+  for (var i = 0; i < cards.length; i++) {
+    var nomCard = (cards[i].getAttribute("data-nom") || "").toLowerCase();
+    var h3 = cards[i].querySelector("h3");
+    var titre = h3 ? h3.textContent.toLowerCase() : "";
+    var visible = query === "" || nomCard.indexOf(queryLower) !== -1 || titre.indexOf(queryLower) !== -1;
+    cards[i].style.display = visible ? "block" : "none";
+    if (visible) nbVisible++;
+  }
+  
+  // Message résultats
+  if (!msgEl) return;
+  if (query === "") {
+    msgEl.style.display = "none";
+    if (suggestions) suggestions.style.display = "none";
+    return;
+  }
+  msgEl.style.display = "block";
+  msgEl.textContent = nbVisible === 0
+    ? "😕 Aucun produit trouvé pour \"" + query + "\""
+    : "🔎 " + nbVisible + " produit(s) trouvé(s) pour \"" + query + "\"";
+
+  // Afficher suggestions live
+  afficherSuggestions(queryLower);
+}
+
+function afficherSuggestions(queryLower) {
+  var suggestions = document.getElementById("liste-suggestions");
+  if (!suggestions || !queryLower) { if (suggestions) suggestions.style.display = "none"; return; }
+  indexSuggestionActif = -1;
+
+  var resultats = PRODUITS.filter(function(p) {
+    var champs = (p.nom + " " + p.cats + " " + p.description).toLowerCase();
+    return champs.indexOf(queryLower) !== -1;
+  }).slice(0, 6);
+
+  if (resultats.length === 0) {
+    suggestions.innerHTML = '<div class="suggestion-vide">😕 Aucun résultat pour "' + queryLower + '"</div>';
+    suggestions.style.display = "block";
+    return;
+  }
+
+  suggestions.innerHTML = "";
+  resultats.forEach(function(p, idx) {
+    var div = document.createElement("div");
+    div.className = "suggestion-item";
+    div.setAttribute("data-idx", idx);
+    div.innerHTML =
+      '<img class="suggestion-img" src="' + p.image + '" alt="' + p.nom + '">' +
+      '<div class="suggestion-info">' +
+        '<div class="suggestion-nom">' + p.nom + '</div>' +
+        '<div class="suggestion-prix">' + p.prix.toLocaleString("fr-FR") + ' FCFA</div>' +
+        '<div class="' + (p.enStock ? "suggestion-stock-ok" : "suggestion-stock-no") + '">' + (p.enStock ? "✅ En stock" : "❌ Hors stock") + '</div>' +
+      '</div>';
+    div.onclick = (function(prod) {
+      return function() {
+        fermerSuggestions();
+        allerSection("produits");
+        setTimeout(function() {
+          ouvrirProduit(prod.nom, prod.prix, prod.image, prod.enStock, prod.description);
+        }, 100);
+      };
+    })(p);
+    suggestions.appendChild(div);
+  });
+  suggestions.style.display = "block";
+}
+
+function naviguerSuggestions(e) {
+  var suggestions = document.getElementById("liste-suggestions");
+  if (!suggestions || suggestions.style.display === "none") return;
+  var items = suggestions.querySelectorAll(".suggestion-item");
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    indexSuggestionActif = Math.min(indexSuggestionActif + 1, items.length - 1);
+    mettreEnSurbrillance(items);
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    indexSuggestionActif = Math.max(indexSuggestionActif - 1, -1);
+    mettreEnSurbrillance(items);
+  } else if (e.key === "Enter" && indexSuggestionActif >= 0) {
+    e.preventDefault();
+    items[indexSuggestionActif].click();
+  } else if (e.key === "Escape") {
+    fermerSuggestions();
+  }
+}
+
+function mettreEnSurbrillance(items) {
+  for (var i = 0; i < items.length; i++) {
+    items[i].classList.toggle("actif", i === indexSuggestionActif);
+  }
+}
+
+function fermerSuggestions() {
+  var s = document.getElementById("liste-suggestions");
+  if (s) s.style.display = "none";
+}
+
+function effacerRecherche() {
+  var champ = document.getElementById("champ-recherche");
+  if (champ) { champ.value = ""; champ.focus(); }
+  rechercherProduit();
+}
+
+// Fermer suggestions si clic ailleurs
+document.addEventListener("click", function(e) {
+  var wrap = document.getElementById("wrap-recherche");
+  if (wrap && !wrap.contains(e.target)) fermerSuggestions();
+});
+
+// ===== FILTRES CATÉGORIES =====
+function filtrerCategorie(mots, btn) {
+  // Mettre à jour bouton actif
+  var btns = document.querySelectorAll(".filtre-btn");
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove("actif");
+  if (btn) btn.classList.add("actif");
+
+  // Effacer la recherche texte
+  var champ = document.getElementById("champ-recherche");
+  if (champ) champ.value = "";
+  var btnEffacer = document.getElementById("btn-effacer");
+  if (btnEffacer) btnEffacer.style.display = "none";
+  fermerSuggestions();
+
+  var cards = document.querySelectorAll("#grille-produits .card");
+  var nbVisible = 0;
+  var motsList = mots ? mots.toLowerCase().split(" ") : [];
+
+  for (var i = 0; i < cards.length; i++) {
+    var nomCard = (cards[i].getAttribute("data-nom") || "").toLowerCase();
+    var h3 = cards[i].querySelector("h3");
+    var titre = h3 ? h3.textContent.toLowerCase() : "";
+    var champs = nomCard + " " + titre;
+    var visible = mots === "" || motsList.some(function(m) { return champs.indexOf(m) !== -1; });
+    cards[i].style.display = visible ? "block" : "none";
+    if (visible) nbVisible++;
+  }
+
+  var msgEl = document.getElementById("resultat-recherche");
+  if (!msgEl) return;
+  if (mots === "") { msgEl.style.display = "none"; return; }
+  msgEl.style.display = "block";
+  msgEl.textContent = "🔎 " + nbVisible + " produit(s) dans cette catégorie";
+}
+
+// ===== DETAIL PRODUIT =====
+var quantiteActuelle = 1;
+var nomProduitActuel = "";
+var prixProduitActuel = 0;
+
+function ouvrirProduit(nom, prix, image, enStock, description) {
+  quantiteActuelle = 1;
+  nomProduitActuel = nom;
+  prixProduitActuel = prix;
+  document.getElementById("detail-img").src = image;
+  document.getElementById("detail-nom").textContent = nom;
+  document.getElementById("detail-prix").textContent = prix + " FCFA";
+  document.getElementById("detail-description").textContent = description;
+  document.getElementById("quantite").textContent = 1;
+  var stock = document.getElementById("detail-stock");
+  stock.textContent = enStock ? "📦 En stock" : "❌ Hors stock";
+  stock.className = "stock-badge " + (enStock ? "en-stock" : "hors-stock");
+  document.getElementById("page-produit").style.display = "block";
+  window.scrollTo(0, 0);
+}
+
+function ajouterDepuisDetail() {
+  if (!utilisateurConnecte) {
+    afficherNotification("🔐 Connectez-vous pour acheter !");
+    setTimeout(function() { fermerProduit(); ouvrirConnexion(); }, 800);
+    return;
+  }
+  for (var i = 0; i < quantiteActuelle; i++) {
+    ajouterAuPanier(nomProduitActuel, prixProduitActuel);
+  }
+  fermerProduit();
+}
+
+function changerQuantite(val) {
+  quantiteActuelle = Math.max(1, quantiteActuelle + val);
+  document.getElementById("quantite").textContent = quantiteActuelle;
+}
+
+function fermerProduit() {
+  document.getElementById("page-produit").style.display = "none";
+}
+
+// ===== DIAPORAMA =====
+var slideIdx = 0;
+var sliderTimer = null;
+
+function afficherSlide(n) {
+  var slides = document.querySelectorAll(".slide");
+  var dots = document.querySelectorAll(".dot");
+  if (slides.length === 0) return;
+  slideIdx = ((n % slides.length) + slides.length) % slides.length;
+  for (var i = 0; i < slides.length; i++) slides[i].classList.remove("active");
+  for (var i = 0; i < dots.length; i++) dots[i].classList.remove("active");
+  slides[slideIdx].classList.add("active");
+  if (dots[slideIdx]) dots[slideIdx].classList.add("active");
+}
+
+function allerSlide(n) {
+  afficherSlide(n);
+  clearInterval(sliderTimer);
+  sliderTimer = setInterval(function() { afficherSlide(slideIdx + 1); }, 4000);
+}
+
+// ===== DÉMARRAGE =====
+window.addEventListener("load", function() {
+  // Démarrer le diaporama
+  var slides = document.querySelectorAll(".slide");
+  if (slides.length > 0) {
+    afficherSlide(0);
+    sliderTimer = setInterval(function() { afficherSlide(slideIdx + 1); }, 4000);
+  }
+
+  // CORRECTION : afficher la page accueil au démarrage
+  allerSection("accueil");
+
+  // CORRECTION : bouton acheter dans le détail produit bien lié
+  var btnAcheter = document.getElementById("detail-acheter");
+  if (btnAcheter) {
+    btnAcheter.onclick = function() { ajouterDepuisDetail(); };
+  }
+
+  // Mettre à jour le compteur panier si données en session
+  mettreAJourCompteur();
+});
+
+</script>
+
+</body>
+</html>
