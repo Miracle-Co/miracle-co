@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔐 Admin — Miracle & Co</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', sans-serif; background: #0f0f0f; color: #eee; min-height: 100vh; }
+
+/* ===== LOGIN ===== */
+#ecran-login {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 20px;
+}
+.login-box {
+  background: #1a1a1a; border-radius: 20px; padding: 40px 30px;
+  width: 100%; max-width: 380px; text-align: center;
+  border: 1px solid #2a2a2a; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.login-logo { font-size: 48px; margin-bottom: 8px; }
+.login-titre { font-size: 22px; font-weight: bold; color: #f5a623; margin-bottom: 4px; }
+.login-sous { font-size: 13px; color: #777; margin-bottom: 28px; }
+.login-box input {
+  width: 100%; padding: 14px 18px; border-radius: 12px;
+  border: 2px solid #2a2a2a; background: #0f0f0f; color: #eee;
+  font-size: 15px; margin-bottom: 12px; outline: none; transition: border-color 0.2s;
+}
+.login-box input:focus { border-color: #f5a623; }
+.btn-login {
+  width: 100%; padding: 15px; background: #f5a623; color: white;
+  border: none; border-radius: 12px; font-size: 16px; font-weight: bold;
+  cursor: pointer; transition: background 0.2s;
+}
+.btn-login:hover { background: #e0921a; }
+#msg-login { margin-top: 12px; font-size: 13px; color: #ff6b6b; }
+
+/* ===== APP PRINCIPALE ===== */
+#app { display: none; }
+
+/* Header admin */
+.admin-header {
+  background: #1a1a1a; padding: 0 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 58px; position: sticky; top: 0; z-index: 100;
+  border-bottom: 2px solid #f5a623;
+}
+.admin-logo { color: #f5a623; font-size: 18px; font-weight: bold; }
+.admin-logo span { color: #eee; font-size: 13px; font-weight: normal; margin-left: 8px; }
+.btn-deconnexion {
+  background: transparent; color: #ff6b6b; border: 1px solid #ff6b6b;
+  padding: 7px 14px; border-radius: 8px; font-size: 13px; cursor: pointer;
+}
+.btn-deconnexion:hover { background: #ff6b6b; color: white; }
+
+/* Onglets */
+.admin-tabs {
+  display: flex; background: #111; border-bottom: 1px solid #2a2a2a;
+  overflow-x: auto;
+}
+.tab-btn {
+  padding: 14px 20px; background: none; border: none; color: #888;
+  font-size: 14px; font-weight: bold; cursor: pointer; white-space: nowrap;
+  border-bottom: 3px solid transparent; transition: all 0.2s;
+}
+.tab-btn.actif { color: #f5a623; border-bottom-color: #f5a623; }
+.tab-btn:hover { color: #eee; }
+
+.tab-content { display: none; padding: 20px; }
+.tab-content.actif { display: block; }
+
+/* ===== AJOUTER UN PRODUIT ===== */
+.form-section { background: #1a1a1a; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+.form-section h3 { font-size: 16px; color: #f5a623; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media(max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+.champ label { display: block; font-size: 12px; color: #888; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+.champ input, .champ textarea, .champ select {
+  width: 100%; padding: 12px 14px; border-radius: 10px;
+  border: 2px solid #2a2a2a; background: #0f0f0f; color: #eee;
+  font-size: 14px; outline: none; transition: border-color 0.2s;
+  font-family: inherit;
+}
+.champ textarea { resize: vertical; min-height: 90px; }
+.champ input:focus, .champ textarea:focus, .champ select:focus { border-color: #f5a623; }
+.champ-full { grid-column: 1 / -1; }
+
+/* Zone photo */
+.zone-photo {
+  border: 2px dashed #2a2a2a; border-radius: 12px; padding: 20px;
+  text-align: center; cursor: pointer; transition: border-color 0.2s;
+  position: relative; min-height: 120px; display: flex;
+  flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+}
+.zone-photo:hover { border-color: #f5a623; }
+.zone-photo.has-image { border-style: solid; border-color: #1a7a1a; }
+.zone-photo input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.zone-photo-icone { font-size: 32px; }
+.zone-photo-texte { font-size: 13px; color: #777; }
+.apercu-photo { max-width: 120px; max-height: 120px; border-radius: 10px; object-fit: cover; }
+.nom-fichier { font-size: 12px; color: #4CAF50; margin-top: 4px; }
+
+/* Toggle stock */
+.toggle-stock { display: flex; align-items: center; gap: 10px; }
+.switch { position: relative; display: inline-block; width: 48px; height: 26px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider-sw {
+  position: absolute; cursor: pointer; inset: 0;
+  background: #333; border-radius: 26px; transition: 0.3s;
+}
+.slider-sw:before {
+  content: ""; position: absolute; height: 20px; width: 20px;
+  left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s;
+}
+input:checked + .slider-sw { background: #1a7a1a; }
+input:checked + .slider-sw:before { transform: translateX(22px); }
+
+/* Bouton ajouter */
+.btn-ajouter-produit {
+  width: 100%; padding: 16px; background: #1a7a1a; color: white;
+  border: none; border-radius: 12px; font-size: 16px; font-weight: bold;
+  cursor: pointer; transition: background 0.2s; margin-top: 6px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-ajouter-produit:hover { background: #155a15; }
+#msg-ajout { text-align: center; padding: 10px; font-weight: bold; font-size: 14px; }
+
+/* ===== LISTE DES PRODUITS ===== */
+.stats-bar {
+  display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
+}
+.stat-card {
+  background: #1a1a1a; border-radius: 12px; padding: 16px 20px;
+  flex: 1; min-width: 120px; border-left: 3px solid #f5a623;
+}
+.stat-card.vert { border-left-color: #1a7a1a; }
+.stat-card.rouge { border-left-color: #ff6b6b; }
+.stat-val { font-size: 28px; font-weight: bold; color: #f5a623; }
+.stat-card.vert .stat-val { color: #2ecc71; }
+.stat-card.rouge .stat-val { color: #ff6b6b; }
+.stat-label { font-size: 12px; color: #777; margin-top: 2px; }
+
+.barre-recherche-admin {
+  display: flex; gap: 10px; margin-bottom: 16px;
+}
+.barre-recherche-admin input {
+  flex: 1; padding: 11px 16px; border-radius: 10px;
+  border: 2px solid #2a2a2a; background: #0f0f0f; color: #eee;
+  font-size: 14px; outline: none;
+}
+.barre-recherche-admin input:focus { border-color: #f5a623; }
+
+.produit-item {
+  background: #1a1a1a; border-radius: 14px; padding: 14px;
+  display: flex; gap: 14px; align-items: center; margin-bottom: 10px;
+  border: 1px solid #2a2a2a; transition: border-color 0.2s;
+}
+.produit-item:hover { border-color: #333; }
+.produit-img-mini {
+  width: 64px; height: 64px; border-radius: 10px; object-fit: cover;
+  flex-shrink: 0; background: #0f0f0f; font-size: 28px;
+  display: flex; align-items: center; justify-content: center;
+}
+.produit-info { flex: 1; min-width: 0; }
+.produit-nom-admin { font-weight: bold; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.produit-prix-admin { color: #1a7a1a; font-size: 14px; font-weight: bold; }
+.produit-cats-admin { font-size: 11px; color: #666; margin-top: 2px; }
+.badge-stock-ok { background: #1a7a1a; color: white; font-size: 11px; padding: 2px 8px; border-radius: 20px; }
+.badge-stock-no { background: #5a1a1a; color: #ff6b6b; font-size: 11px; padding: 2px 8px; border-radius: 20px; }
+.produit-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.btn-edit { background: #1a3a7a; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+.btn-suppr { background: #5a1a1a; color: #ff6b6b; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+.btn-edit:hover { background: #1a4aaa; }
+.btn-suppr:hover { background: #7a1a1a; }
+
+/* Aucun produit */
+.empty-state { text-align: center; padding: 50px 20px; color: #555; }
+.empty-state-icone { font-size: 48px; margin-bottom: 12px; }
+
+/* Modal édition */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8); z-index: 9999;
+  align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.visible { display: flex; }
+.modal-box {
+  background: #1a1a1a; border-radius: 20px; padding: 24px;
+  width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+}
+.modal-titre { font-size: 18px; font-weight: bold; color: #f5a623; margin-bottom: 18px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+.btn-modal-save { flex: 1; padding: 13px; background: #f5a623; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; }
+.btn-modal-cancel { flex: 1; padding: 13px; background: #2a2a2a; color: #aaa; border: none; border-radius: 10px; font-size: 15px; cursor: pointer; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: #1a7a1a; color: white; padding: 12px 24px;
+  border-radius: 30px; font-size: 14px; font-weight: bold;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4); z-index: 99999;
+  animation: fadeUp 0.3s ease; white-space: nowrap;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #111; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ===== ÉCRAN LOGIN ===== -->
+<div id="ecran-login">
+  <div class="login-box">
+    <div class="login-logo">🛍️</div>
+    <div class="login-titre">Miracle & Co</div>
+    <div class="login-sous">Espace Administrateur — Accès privé</div>
+    <input type="text" id="login-user" placeholder="Identifiant admin" autocomplete="off">
+    <div style="position:relative;">
+      <input type="password" id="login-mdp" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')seConnecterAdmin()">
+      <span onclick="toggleOeilAdmin()" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;opacity:0.6;" id="oeil-admin">👁️</span>
+    </div>
+    <button class="btn-login" onclick="seConnecterAdmin()">🔐 Accéder au panneau admin</button>
+    <div id="msg-login"></div>
+  </div>
+</div>
+
+<!-- ===== APPLICATION ADMIN ===== -->
+<div id="app">
+
+  <div class="admin-header">
+    <div class="admin-logo">🛍️ Miracle & Co <span>— Panneau Admin</span></div>
+    <button class="btn-deconnexion" onclick="seDeconnecterAdmin()">🚪 Déconnexion</button>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="tab-btn actif" onclick="switchTab('ajouter')">➕ Ajouter un produit</button>
+    <button class="tab-btn" onclick="switchTab('liste')">📦 Mes produits</button>
+    <button class="tab-btn" onclick="switchTab('export')">💾 Exporter</button>
+  </div>
+
+  <!-- ===== TAB : AJOUTER ===== -->
+  <div class="tab-content actif" id="tab-ajouter">
+    <div class="form-section">
+      <h3>📦 Informations du produit</h3>
+      <div class="form-grid">
+        <div class="champ">
+          <label>Nom du produit *</label>
+          <input type="text" id="p-nom" placeholder="Ex: Sac à main cuir">
+        </div>
+        <div class="champ">
+          <label>Prix (FCFA) *</label>
+          <input type="number" id="p-prix" placeholder="Ex: 5000" min="0">
+        </div>
+        <div class="champ champ-full">
+          <label>Description</label>
+          <textarea id="p-desc" placeholder="Décrivez le produit en quelques mots..."></textarea>
+        </div>
+        <div class="champ">
+          <label>Catégories (mots-clés)</label>
+          <input type="text" id="p-cats" placeholder="Ex: sac femme main cuir">
+        </div>
+        <div class="champ">
+          <label>Disponibilité</label>
+          <div class="toggle-stock" style="margin-top:10px;">
+            <label class="switch">
+              <input type="checkbox" id="p-stock" checked>
+              <span class="slider-sw"></span>
+            </label>
+            <span id="label-stock">En stock</span>
+          </div>
+        </div>
+        <div class="champ champ-full">
+          <label>Photo du produit</label>
+          <div class="zone-photo" id="zone-photo">
+            <input type="file" id="p-photo" accept="image/*" onchange="previewPhoto(event)">
+            <div class="zone-photo-icone">📷</div>
+            <div class="zone-photo-texte">Appuyez ici pour choisir une photo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="msg-ajout"></div>
+    <button class="btn-ajouter-produit" onclick="ajouterProduit()">
+      ✅ Ajouter ce produit à la boutique
+    </button>
+  </div>
+
+  <!-- ===== TAB : LISTE ===== -->
+  <div class="tab-content" id="tab-liste">
+    <div class="stats-bar">
+      <div class="stat-card"><div class="stat-val" id="stat-total">0</div><div class="stat-label">Total produits</div></div>
+      <div class="stat-card vert"><div class="stat-val" id="stat-stock">0</div><div class="stat-label">En stock</div></div>
+      <div class="stat-card rouge"><div class="stat-val" id="stat-rupture">0</div><div class="stat-label">Rupture</div></div>
+    </div>
+    <div class="barre-recherche-admin">
+      <input type="text" id="recherche-admin" placeholder="🔍 Rechercher un produit..." oninput="filtrerListeAdmin()">
+    </div>
+    <div id="liste-produits-admin"></div>
+  </div>
+
+  <!-- ===== TAB : EXPORT ===== -->
+  <div class="tab-content" id="tab-export">
+    <div class="form-section">
+      <h3>💾 Sauvegarder & Exporter</h3>
+      <p style="color:#888;font-size:14px;line-height:1.7;margin-bottom:20px;">
+        Vos produits sont sauvegardés automatiquement dans ce navigateur.<br>
+        Si vous changez d'appareil ou effacez le cache, utilisez le bouton ci-dessous pour télécharger une sauvegarde JSON, puis importez-la sur le nouvel appareil.
+      </p>
+      <button class="btn-ajouter-produit" onclick="exporterJSON()" style="background:#1a3a7a;margin-bottom:12px;">
+        📥 Télécharger la sauvegarde (JSON)
+      </button>
+      <div class="champ" style="margin-top:16px;">
+        <label>Importer une sauvegarde</label>
+        <input type="file" id="fichier-import" accept=".json" onchange="importerJSON(event)" style="margin-top:8px;padding:10px;">
+      </div>
+      <div id="msg-export" style="margin-top:12px;font-weight:bold;"></div>
+    </div>
+    <div class="form-section">
+      <h3>⚠️ Zone Danger</h3>
+      <p style="color:#888;font-size:13px;margin-bottom:16px;">Supprimer tous les produits ajoutés via l'admin. Les produits de base du site restent intacts.</p>
+      <button onclick="toutEffacer()" style="background:#5a1a1a;color:#ff6b6b;border:1px solid #7a1a1a;padding:12px 20px;border-radius:10px;cursor:pointer;font-size:14px;">
+        🗑️ Effacer tous les produits admin
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal édition -->
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal-box">
+    <div class="modal-titre">✏️ Modifier le produit</div>
+    <div class="form-grid">
+      <input type="hidden" id="edit-idx">
+      <div class="champ"><label>Nom *</label><input type="text" id="edit-nom"></div>
+      <div class="champ"><label>Prix (FCFA) *</label><input type="number" id="edit-prix"></div>
+      <div class="champ champ-full"><label>Description</label><textarea id="edit-desc"></textarea></div>
+      <div class="champ"><label>Catégories</label><input type="text" id="edit-cats"></div>
+      <div class="champ">
+        <label>Stock</label>
+        <div class="toggle-stock" style="margin-top:10px;">
+          <label class="switch"><input type="checkbox" id="edit-stock"><span class="slider-sw"></span></label>
+          <span id="edit-label-stock">En stock</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="fermerModal()">Annuler</button>
+      <button class="btn-modal-save" onclick="sauvegarderEdition()">💾 Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== CREDENTIALS ADMIN =====
+var ADMIN_USER = "miracleco";
+var ADMIN_MDP  = "Miracle2025!";
+var STORAGE_KEY = "miracleco_produits";
+
+// ===== LOGIN =====
+function seConnecterAdmin() {
+  var u = document.getElementById("login-user").value.trim();
+  var m = document.getElementById("login-mdp").value;
+  var msg = document.getElementById("msg-login");
+  if (!u || !m) { msg.textContent = "⚠️ Remplissez les deux champs."; return; }
+  if (u === ADMIN_USER && m === ADMIN_MDP) {
+    sessionStorage.setItem("admin_auth", "1");
+    document.getElementById("ecran-login").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    chargerListe();
+  } else {
+    msg.textContent = "❌ Identifiant ou mot de passe incorrect.";
+    document.getElementById("login-mdp").value = "";
+  }
+}
+
+function seDeconnecterAdmin() {
+  sessionStorage.removeItem("admin_auth");
+  document.getElementById("ecran-login").style.display = "flex";
+  document.getElementById("app").style.display = "none";
+}
+
+function toggleOeilAdmin() {
+  var champ = document.getElementById("login-mdp");
+  var oeil = document.getElementById("oeil-admin");
+  champ.type = champ.type === "password" ? "text" : "password";
+  oeil.textContent = champ.type === "password" ? "👁️" : "🙈";
+}
+
+// Auto-reconnexion si déjà authentifié dans cette session
+if (sessionStorage.getItem("admin_auth") === "1") {
+  document.getElementById("ecran-login").style.display = "none";
+  document.getElementById("app").style.display = "block";
+}
+
+// ===== ONGLETS =====
+function switchTab(id) {
+  document.querySelectorAll(".tab-btn").forEach(function(b, i) {
+    b.classList.toggle("actif", ["ajouter","liste","export"][i] === id);
+  });
+  document.querySelectorAll(".tab-content").forEach(function(c) { c.classList.remove("actif"); });
+  document.getElementById("tab-" + id).classList.add("actif");
+  if (id === "liste") chargerListe();
+}
+
+// ===== STOCKAGE =====
+function lireProduits() {
+  try {
+    var d = localStorage.getItem(STORAGE_KEY);
+    return d ? JSON.parse(d) : [];
+  } catch(e) { return []; }
+}
+
+function sauvegarderProduits(liste) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(liste));
+}
+
+// ===== PRÉVISUALISATION PHOTO =====
+var photoBase64 = null;
+
+function previewPhoto(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    photoBase64 = ev.target.result;
+    var zone = document.getElementById("zone-photo");
+    zone.classList.add("has-image");
+    zone.innerHTML = '<input type="file" id="p-photo" accept="image/*" onchange="previewPhoto(event)">' +
+      '<img class="apercu-photo" src="' + photoBase64 + '">' +
+      '<div class="nom-fichier">✅ ' + file.name + '</div>';
+  };
+  reader.readAsDataURL(file);
+}
+
+// Toggle label stock
+document.getElementById("p-stock").addEventListener("change", function() {
+  document.getElementById("label-stock").textContent = this.checked ? "En stock" : "Rupture de stock";
+});
+document.getElementById("edit-stock").addEventListener("change", function() {
+  document.getElementById("edit-label-stock").textContent = this.checked ? "En stock" : "Rupture de stock";
+});
+
+// ===== AJOUTER UN PRODUIT =====
+function ajouterProduit() {
+  var nom   = document.getElementById("p-nom").value.trim();
+  var prix  = parseInt(document.getElementById("p-prix").value);
+  var desc  = document.getElementById("p-desc").value.trim();
+  var cats  = document.getElementById("p-cats").value.trim();
+  var stock = document.getElementById("p-stock").checked;
+  var msg   = document.getElementById("msg-ajout");
+
+  if (!nom) { msg.style.color = "#ff6b6b"; msg.textContent = "⚠️ Le nom est obligatoire."; return; }
+  if (!prix || prix <= 0) { msg.style.color = "#ff6b6b"; msg.textContent = "⚠️ Entrez un prix valide."; return; }
+
+  var produit = {
+    nom: nom,
+    prix: prix,
+    description: desc || nom,
+    cats: cats,
+    enStock: stock,
+    image: photoBase64 || null,
+    dateAjout: new Date().toLocaleDateString("fr-FR")
+  };
+
+  var liste = lireProduits();
+  liste.push(produit);
+  sauvegarderProduits(liste);
+
+  msg.style.color = "#2ecc71";
+  msg.textContent = "✅ Produit \"" + nom + "\" ajouté avec succès !";
+  afficherToast("✅ " + nom + " ajouté !");
+
+  // Réinitialiser le formulaire
+  setTimeout(function() {
+    document.getElementById("p-nom").value = "";
+    document.getElementById("p-prix").value = "";
+    document.getElementById("p-desc").value = "";
+    document.getElementById("p-cats").value = "";
+    document.getElementById("p-stock").checked = true;
+    document.getElementById("label-stock").textContent = "En stock";
+    photoBase64 = null;
+    var zone = document.getElementById("zone-photo");
+    zone.classList.remove("has-image");
+    zone.innerHTML = '<input type="file" id="p-photo" accept="image/*" onchange="previewPhoto(event)">' +
+      '<div class="zone-photo-icone">📷</div>' +
+      '<div class="zone-photo-texte">Appuyez ici pour choisir une photo</div>';
+    msg.textContent = "";
+  }, 2000);
+}
+
+// ===== LISTE DES PRODUITS =====
+function chargerListe() {
+  var liste = lireProduits();
+  var recherche = (document.getElementById("recherche-admin") || {}).value || "";
+  var q = recherche.toLowerCase().trim();
+  var filtrée = q ? liste.filter(function(p) {
+    return (p.nom + " " + p.cats + " " + p.description).toLowerCase().indexOf(q) !== -1;
+  }) : liste;
+
+  // Stats
+  var enStock = liste.filter(function(p) { return p.enStock; }).length;
+  document.getElementById("stat-total").textContent = liste.length;
+  document.getElementById("stat-stock").textContent = enStock;
+  document.getElementById("stat-rupture").textContent = liste.length - enStock;
+
+  var container = document.getElementById("liste-produits-admin");
+
+  if (filtrée.length === 0) {
+    container.innerHTML = '<div class="empty-state">' +
+      '<div class="empty-state-icone">' + (q ? "🔍" : "📦") + '</div>' +
+      '<div>' + (q ? "Aucun résultat pour \"" + q + "\"" : "Aucun produit ajouté pour l\'instant.<br>Allez dans « Ajouter un produit » pour commencer !") + '</div></div>';
+    return;
+  }
+
+  container.innerHTML = filtrée.map(function(p, i) {
+    var realIdx = liste.indexOf(p);
+    var imgHtml = p.image
+      ? '<img class="produit-img-mini" src="' + p.image + '" alt="' + p.nom + '">'
+      : '<div class="produit-img-mini">📦</div>';
+    return '<div class="produit-item">' +
+      imgHtml +
+      '<div class="produit-info">' +
+        '<div class="produit-nom-admin">' + p.nom + '</div>' +
+        '<div class="produit-prix-admin">' + p.prix.toLocaleString("fr-FR") + ' FCFA</div>' +
+        '<div class="produit-cats-admin">' + (p.cats || "—") + '</div>' +
+        '<span class="' + (p.enStock ? "badge-stock-ok" : "badge-stock-no") + '">' +
+          (p.enStock ? "✅ En stock" : "❌ Rupture") + '</span>' +
+        (p.dateAjout ? '<span style="font-size:11px;color:#555;margin-left:8px;">' + p.dateAjout + '</span>' : '') +
+      '</div>' +
+      '<div class="produit-actions">' +
+        '<button class="btn-edit" onclick="ouvrirEdition(' + realIdx + ')">✏️</button>' +
+        '<button class="btn-suppr" onclick="supprimerProduit(' + realIdx + ')">🗑️</button>' +
+      '</div>' +
+    '</div>';
+  }).join("");
+}
+
+function filtrerListeAdmin() { chargerListe(); }
+
+// ===== SUPPRESSION =====
+function supprimerProduit(idx) {
+  if (!confirm("Supprimer ce produit ?")) return;
+  var liste = lireProduits();
+  var nom = liste[idx] ? liste[idx].nom : "";
+  liste.splice(idx, 1);
+  sauvegarderProduits(liste);
+  afficherToast("🗑️ \"" + nom + "\" supprimé.");
+  chargerListe();
+}
+
+// ===== ÉDITION =====
+function ouvrirEdition(idx) {
+  var liste = lireProduits();
+  var p = liste[idx];
+  if (!p) return;
+  document.getElementById("edit-idx").value = idx;
+  document.getElementById("edit-nom").value = p.nom;
+  document.getElementById("edit-prix").value = p.prix;
+  document.getElementById("edit-desc").value = p.description || "";
+  document.getElementById("edit-cats").value = p.cats || "";
+  document.getElementById("edit-stock").checked = p.enStock;
+  document.getElementById("edit-label-stock").textContent = p.enStock ? "En stock" : "Rupture de stock";
+  document.getElementById("modal-edit").classList.add("visible");
+}
+
+function fermerModal() { document.getElementById("modal-edit").classList.remove("visible"); }
+
+function sauvegarderEdition() {
+  var idx  = parseInt(document.getElementById("edit-idx").value);
+  var nom  = document.getElementById("edit-nom").value.trim();
+  var prix = parseInt(document.getElementById("edit-prix").value);
+  if (!nom || !prix) { alert("Nom et prix obligatoires."); return; }
+  var liste = lireProduits();
+  liste[idx].nom = nom;
+  liste[idx].prix = prix;
+  liste[idx].description = document.getElementById("edit-desc").value.trim();
+  liste[idx].cats = document.getElementById("edit-cats").value.trim();
+  liste[idx].enStock = document.getElementById("edit-stock").checked;
+  sauvegarderProduits(liste);
+  fermerModal();
+  afficherToast("💾 Produit mis à jour !");
+  chargerListe();
+}
+
+// ===== EXPORT/IMPORT =====
+function exporterJSON() {
+  var liste = lireProduits();
+  if (!liste.length) { alert("Aucun produit à exporter."); return; }
+  var blob = new Blob([JSON.stringify(liste, null, 2)], { type: "application/json" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "miracle-co-produits-" + new Date().toISOString().slice(0,10) + ".json";
+  a.click();
+  afficherToast("📥 Sauvegarde téléchargée !");
+}
+
+function importerJSON(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      var data = JSON.parse(ev.target.result);
+      if (!Array.isArray(data)) throw new Error("Format invalide");
+      sauvegarderProduits(data);
+      document.getElementById("msg-export").style.color = "#2ecc71";
+      document.getElementById("msg-export").textContent = "✅ " + data.length + " produits importés !";
+      afficherToast("✅ Import réussi !");
+    } catch(err) {
+      document.getElementById("msg-export").style.color = "#ff6b6b";
+      document.getElementById("msg-export").textContent = "❌ Fichier invalide.";
+    }
+  };
+  reader.readAsText(file);
+}
+
+function toutEffacer() {
+  if (!confirm("⚠️ Supprimer TOUS les produits admin ? Cette action est irréversible.")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  afficherToast("🗑️ Tous les produits effacés.");
+  chargerListe();
+}
+
+// ===== TOAST =====
+function afficherToast(msg) {
+  var t = document.createElement("div");
+  t.className = "toast";
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function() { t.style.opacity="0"; t.style.transition="opacity 0.4s"; setTimeout(function(){t.remove();},400); }, 2500);
+}
+
+// Charger la liste dès le démarrage si connecté
+if (sessionStorage.getItem("admin_auth") === "1") chargerListe();
+</script>
+</body>
+</html>
