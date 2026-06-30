@@ -1397,8 +1397,7 @@ function majRappelInscription() {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-  genererCartes();
-  genererPhares();
+  chargerProduitsEnLigne();
   majRappelInscription();
   majAvatarNav();
   chargerEmailSouvenir();
@@ -1814,16 +1813,33 @@ function validerPanier() {
   window.location.href = url;
 }
 
-// ===== DONNÉES PRODUITS (pour suggestions) =====
-// ===== PRODUITS — chargés depuis l'admin =====
+// ===== DONNÉES PRODUITS — chargées depuis JSONBin (base en ligne) =====
+var JSONBIN_BIN_ID = "6a438713da38895dfe14d121";
+var JSONBIN_API_KEY = "$2a$10$sJMLgxLAJp/KpBy.spGqfu/mShr5KInpFJAhQI263hhL1EuQtGcea";
+var JSONBIN_URL = "https://api.jsonbin.io/v3/b/" + JSONBIN_BIN_ID;
+
 var PRODUITS = [];
-try {
-  var adminData = localStorage.getItem("miracleco_produits");
-  if (adminData) {
-    var parsed = JSON.parse(adminData);
-    if (Array.isArray(parsed)) PRODUITS = parsed;
+
+async function chargerProduitsEnLigne() {
+  try {
+    var res = await fetch(JSONBIN_URL + "/latest", {
+      headers: { "X-Master-Key": JSONBIN_API_KEY }
+    });
+    var data = await res.json();
+    var liste = (data.record && data.record.produits) ? data.record.produits : [];
+    PRODUITS = liste;
+    localStorage.setItem("miracleco_produits", JSON.stringify(liste));
+  } catch(e) {
+    console.error("Erreur chargement produits:", e);
+    // fallback cache local si pas de connexion
+    try {
+      var d = localStorage.getItem("miracleco_produits");
+      PRODUITS = d ? JSON.parse(d) : [];
+    } catch(e2) { PRODUITS = []; }
   }
-} catch(e) { PRODUITS = []; }
+  genererCartes();
+  genererPhares();
+}
 
 // ===== RENDU DYNAMIQUE DES PRODUITS =====
 function genererCartes() {
