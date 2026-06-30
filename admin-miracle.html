@@ -363,6 +363,13 @@ var ADMIN_USER = "miracleco";
 var ADMIN_MDP  = "Miracle2025!";
 var STORAGE_KEY = "miracleco_produits";
 
+// ===== JSONBIN.IO — BASE DE DONNÉES EN LIGNE =====
+var JSONBIN_BIN_ID = "6a438713da38895dfe14d121";
+var JSONBIN_API_KEY = "$2a$10$sJMLgxLAJp/KpBy.spGqfu/mShr5KInpFJAhQI263hhL1EuQtGcea";
+var JSONBIN_URL = "https://api.jsonbin.io/v3/b/" + JSONBIN_BIN_ID;
+
+var produitsCache = [];
+
 // ===== LOGIN =====
 function seConnecterAdmin() {
   var u = document.getElementById("login-user").value.trim();
@@ -410,15 +417,54 @@ function switchTab(id) {
 }
 
 // ===== STOCKAGE =====
-function lireProduits() {
+// Lire les produits depuis JSONBin (en ligne)
+async function lireProduitsEnLigne() {
   try {
-    var d = localStorage.getItem(STORAGE_KEY);
-    return d ? JSON.parse(d) : [];
-  } catch(e) { return []; }
+    var res = await fetch(JSONBIN_URL + "/latest", {
+      headers: { "X-Master-Key": JSONBIN_API_KEY }
+    });
+    var data = await res.json();
+    var liste = (data.record && data.record.produits) ? data.record.produits : [];
+    produitsCache = liste;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(liste)); // cache local de secours
+    return liste;
+  } catch(e) {
+    console.error("Erreur lecture JSONBin:", e);
+    // fallback sur le cache local si pas de connexion
+    try {
+      var d = localStorage.getItem(STORAGE_KEY);
+      return d ? JSON.parse(d) : [];
+    } catch(e2) { return []; }
+  }
 }
 
+// Sauvegarder les produits sur JSONBin (en ligne)
+async function sauvegarderProduitsEnLigne(liste) {
+  try {
+    await fetch(JSONBIN_URL, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": JSONBIN_API_KEY
+      },
+      body: JSON.stringify({ produits: liste })
+    });
+    produitsCache = liste;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(liste));
+    return true;
+  } catch(e) {
+    console.error("Erreur sauvegarde JSONBin:", e);
+    afficherToast("⚠️ Connexion impossible, sauvegarde locale uniquement.");
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(liste));
+    return false;
+  }
+}
+
+// Version synchrone pratique (utilise le cache déjà chargé)
+function lireProduits() { return produitsCache; }
 function sauvegarderProduits(liste) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(liste));
+  produitsCache = liste;
+  sauvegarderProduitsEnLigne(liste);
 }
 
 // ===== PRÉVISUALISATION PHOTO =====
@@ -448,7 +494,7 @@ document.getElementById("edit-stock").addEventListener("change", function() {
 });
 
 // ===== AJOUTER UN PRODUIT =====
-function ajouterProduit() {
+async function ajouterProduit() {
   var nom   = document.getElementById("p-nom").value.trim();
   var prix  = parseInt(document.getElementById("p-prix").value);
   var desc  = document.getElementById("p-desc").value.trim();
@@ -456,8 +502,8 @@ function ajouterProduit() {
   var stock = document.getElementById("p-stock").checked;
   var msg   = document.getElementById("msg-ajout");
 
-  if (!nom) { msg.style.color = "#ff6b6b"; msg.textContent = "⚠️ Le nom est obligatoire."; return; }
-  if (!prix || prix <= 0) { msg.style.color = "#ff6b6b"; msg.textContent = "⚠️ Entrez un prix valide."; return; }
+  if (!nom) { msg.style.color = "#ff6b6b"; msg.textContent = "Le nom est obligatoire."; return; }
+  if (!prix || prix <= 0) { msg.style.color = "#ff6b6b"; msg.textContent = "Entrez un prix valide."; return; }
 
   var produit = {
     nom: nom,
@@ -469,15 +515,17 @@ function ajouterProduit() {
     dateAjout: new Date().toLocaleDateString("fr-FR")
   };
 
-  var liste = lireProduits();
+  msg.style.color = "#f5a623";
+  msg.textContent = "Enregistrement en cours...";
+
+  var liste = await lireProduitsEnLigne();
   liste.push(produit);
-  sauvegarderProduits(liste);
+  await sauvegarderProduitsEnLigne(liste);
 
   msg.style.color = "#2ecc71";
-  msg.textContent = "✅ Produit \"" + nom + "\" ajouté avec succès !";
-  afficherToast("✅ " + nom + " ajouté !");
+  msg.textContent = "Produit ajouté avec succès !";
+  afficherToast("Produit ajouté !");
 
-  // Réinitialiser le formulaire
   setTimeout(function() {
     document.getElementById("p-nom").value = "";
     document.getElementById("p-prix").value = "";
@@ -496,68 +544,103 @@ function ajouterProduit() {
 }
 
 // ===== LISTE DES PRODUITS =====
-function chargerListe() {
-  var liste = lireProduits();
+async function chargerListe() {
+  var container = document.getElementById("liste-produits-admin");
+  container.innerHTML = '<div class="empty-state"><div class="empty-state-icone">⏳</div><div>Chargement des produits...</div></div>';
+
+  var liste = await lireProduitsEnLigne();
   var recherche = (document.getElementById("recherche-admin") || {}).value || "";
   var q = recherche.toLowerCase().trim();
-  var filtrée = q ? liste.filter(function(p) {
+  var filtree = q ? liste.filter(function(p) {
     return (p.nom + " " + p.cats + " " + p.description).toLowerCase().indexOf(q) !== -1;
   }) : liste;
 
-  // Stats
   var enStock = liste.filter(function(p) { return p.enStock; }).length;
   document.getElementById("stat-total").textContent = liste.length;
   document.getElementById("stat-stock").textContent = enStock;
   document.getElementById("stat-rupture").textContent = liste.length - enStock;
 
-  var container = document.getElementById("liste-produits-admin");
-
-  if (filtrée.length === 0) {
+  if (filtree.length === 0) {
     container.innerHTML = '<div class="empty-state">' +
       '<div class="empty-state-icone">' + (q ? "🔍" : "📦") + '</div>' +
-      '<div>' + (q ? "Aucun résultat pour \"" + q + "\"" : "Aucun produit ajouté pour l\'instant.<br>Allez dans « Ajouter un produit » pour commencer !") + '</div></div>';
+      '<div>' + (q ? "Aucun resultat pour \"" + q + "\"" : "Aucun produit ajoute pour l'instant.<br>Allez dans « Ajouter un produit » pour commencer !") + '</div></div>';
     return;
   }
 
-  container.innerHTML = filtrée.map(function(p, i) {
+  container.innerHTML = "";
+  for (var i = 0; i < filtree.length; i++) {
+    var p = filtree[i];
     var realIdx = liste.indexOf(p);
-    var imgHtml = p.image
-      ? '<img class="produit-img-mini" src="' + p.image + '" alt="' + p.nom + '">'
-      : '<div class="produit-img-mini">📦</div>';
-    return '<div class="produit-item">' +
-      imgHtml +
-      '<div class="produit-info">' +
-        '<div class="produit-nom-admin">' + p.nom + '</div>' +
-        '<div class="produit-prix-admin">' + p.prix.toLocaleString("fr-FR") + ' FCFA</div>' +
-        '<div class="produit-cats-admin">' + (p.cats || "—") + '</div>' +
-        '<span class="' + (p.enStock ? "badge-stock-ok" : "badge-stock-no") + '">' +
-          (p.enStock ? "✅ En stock" : "❌ Rupture") + '</span>' +
-        (p.dateAjout ? '<span style="font-size:11px;color:#555;margin-left:8px;">' + p.dateAjout + '</span>' : '') +
-      '</div>' +
-      '<div class="produit-actions">' +
-        '<button class="btn-edit" onclick="ouvrirEdition(' + realIdx + ')">✏️</button>' +
-        '<button class="btn-suppr" onclick="supprimerProduit(' + realIdx + ')">🗑️</button>' +
-      '</div>' +
-    '</div>';
-  }).join("");
+    var item = document.createElement("div");
+    item.className = "produit-item";
+
+    var imgEl;
+    if (p.image) {
+      imgEl = document.createElement("img");
+      imgEl.className = "produit-img-mini";
+      imgEl.src = p.image;
+      imgEl.alt = p.nom;
+    } else {
+      imgEl = document.createElement("div");
+      imgEl.className = "produit-img-mini";
+      imgEl.textContent = "📦";
+    }
+    item.appendChild(imgEl);
+
+    var info = document.createElement("div");
+    info.className = "produit-info";
+    info.innerHTML = '<div class="produit-nom-admin"></div><div class="produit-prix-admin"></div><div class="produit-cats-admin"></div>';
+    info.querySelector(".produit-nom-admin").textContent = p.nom;
+    info.querySelector(".produit-prix-admin").textContent = p.prix.toLocaleString("fr-FR") + " FCFA";
+    info.querySelector(".produit-cats-admin").textContent = p.cats || "—";
+
+    var badge = document.createElement("span");
+    badge.className = p.enStock ? "badge-stock-ok" : "badge-stock-no";
+    badge.textContent = p.enStock ? "En stock" : "Rupture";
+    info.appendChild(badge);
+
+    if (p.dateAjout) {
+      var dateEl = document.createElement("span");
+      dateEl.style.cssText = "font-size:11px;color:#555;margin-left:8px;";
+      dateEl.textContent = p.dateAjout;
+      info.appendChild(dateEl);
+    }
+    item.appendChild(info);
+
+    var actions = document.createElement("div");
+    actions.className = "produit-actions";
+    var btnEdit = document.createElement("button");
+    btnEdit.className = "btn-edit";
+    btnEdit.textContent = "✏️";
+    btnEdit.onclick = (function(idx) { return function() { ouvrirEdition(idx); }; })(realIdx);
+    var btnSuppr = document.createElement("button");
+    btnSuppr.className = "btn-suppr";
+    btnSuppr.textContent = "🗑️";
+    btnSuppr.onclick = (function(idx) { return function() { supprimerProduit(idx); }; })(realIdx);
+    actions.appendChild(btnEdit);
+    actions.appendChild(btnSuppr);
+    item.appendChild(actions);
+
+    container.appendChild(item);
+  }
 }
 
 function filtrerListeAdmin() { chargerListe(); }
 
 // ===== SUPPRESSION =====
-function supprimerProduit(idx) {
+async function supprimerProduit(idx) {
   if (!confirm("Supprimer ce produit ?")) return;
-  var liste = lireProduits();
+  var liste = await lireProduitsEnLigne();
   var nom = liste[idx] ? liste[idx].nom : "";
   liste.splice(idx, 1);
-  sauvegarderProduits(liste);
-  afficherToast("🗑️ \"" + nom + "\" supprimé.");
+  await sauvegarderProduitsEnLigne(liste);
+  afficherToast(nom + " supprime.");
   chargerListe();
 }
 
-// ===== ÉDITION =====
-function ouvrirEdition(idx) {
-  var liste = lireProduits();
+// ===== EDITION =====
+async function ouvrirEdition(idx) {
+  var liste = await lireProduitsEnLigne();
   var p = liste[idx];
   if (!p) return;
   document.getElementById("edit-idx").value = idx;
@@ -572,59 +655,61 @@ function ouvrirEdition(idx) {
 
 function fermerModal() { document.getElementById("modal-edit").classList.remove("visible"); }
 
-function sauvegarderEdition() {
+async function sauvegarderEdition() {
   var idx  = parseInt(document.getElementById("edit-idx").value);
   var nom  = document.getElementById("edit-nom").value.trim();
   var prix = parseInt(document.getElementById("edit-prix").value);
   if (!nom || !prix) { alert("Nom et prix obligatoires."); return; }
-  var liste = lireProduits();
+  var liste = await lireProduitsEnLigne();
   liste[idx].nom = nom;
   liste[idx].prix = prix;
   liste[idx].description = document.getElementById("edit-desc").value.trim();
   liste[idx].cats = document.getElementById("edit-cats").value.trim();
   liste[idx].enStock = document.getElementById("edit-stock").checked;
-  sauvegarderProduits(liste);
+  await sauvegarderProduitsEnLigne(liste);
   fermerModal();
-  afficherToast("💾 Produit mis à jour !");
+  afficherToast("Produit mis a jour !");
   chargerListe();
 }
 
 // ===== EXPORT/IMPORT =====
-function exporterJSON() {
-  var liste = lireProduits();
-  if (!liste.length) { alert("Aucun produit à exporter."); return; }
+async function exporterJSON() {
+  var liste = await lireProduitsEnLigne();
+  if (!liste.length) { alert("Aucun produit a exporter."); return; }
   var blob = new Blob([JSON.stringify(liste, null, 2)], { type: "application/json" });
   var a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "miracle-co-produits-" + new Date().toISOString().slice(0,10) + ".json";
   a.click();
-  afficherToast("📥 Sauvegarde téléchargée !");
+  afficherToast("Sauvegarde telechargee !");
 }
 
 function importerJSON(e) {
   var file = e.target.files[0];
   if (!file) return;
   var reader = new FileReader();
-  reader.onload = function(ev) {
+  reader.onload = async function(ev) {
     try {
       var data = JSON.parse(ev.target.result);
       if (!Array.isArray(data)) throw new Error("Format invalide");
-      sauvegarderProduits(data);
+      await sauvegarderProduitsEnLigne(data);
       document.getElementById("msg-export").style.color = "#2ecc71";
-      document.getElementById("msg-export").textContent = "✅ " + data.length + " produits importés !";
-      afficherToast("✅ Import réussi !");
+      document.getElementById("msg-export").textContent = data.length + " produits importes !";
+      afficherToast("Import reussi !");
+      chargerListe();
     } catch(err) {
       document.getElementById("msg-export").style.color = "#ff6b6b";
-      document.getElementById("msg-export").textContent = "❌ Fichier invalide.";
+      document.getElementById("msg-export").textContent = "Fichier invalide.";
     }
   };
   reader.readAsText(file);
 }
 
-function toutEffacer() {
-  if (!confirm("⚠️ Supprimer TOUS les produits admin ? Cette action est irréversible.")) return;
+async function toutEffacer() {
+  if (!confirm("Supprimer TOUS les produits admin ? Cette action est irreversible.")) return;
+  await sauvegarderProduitsEnLigne([]);
   localStorage.removeItem(STORAGE_KEY);
-  afficherToast("🗑️ Tous les produits effacés.");
+  afficherToast("Tous les produits effaces.");
   chargerListe();
 }
 
